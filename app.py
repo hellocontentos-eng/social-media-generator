@@ -267,7 +267,7 @@ with st.sidebar:
     st.header("📝 Customize Your Post")
     business_type = st.selectbox(
         "Business Type:",
-        ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"]
+        ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
         key="business_type_sidebar"  # ← ADD THIS
     )
     # ... rest of your existing sidebar code
