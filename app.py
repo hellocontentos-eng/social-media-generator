@@ -113,13 +113,25 @@ with st.expander("Can I use my own branding?"):
     st.write("Yes! Business plan includes custom colors and logos")
     
     
-# Load fonts
 def load_font(font_name, size):
-    font_path = os.path.join("fonts", font_name)
-    try:
-        return ImageFont.truetype(font_path, size)
-    except:
-        return ImageFont.load_default()
+    # Try multiple font paths
+    font_paths = [
+        os.path.join("fonts", font_name),
+        font_name,
+        f"/usr/share/fonts/truetype/{font_name}",
+        f"/System/Library/Fonts/{font_name}",
+        f"C:/Windows/Fonts/{font_name}"
+    ]
+    
+    for font_path in font_paths:
+        try:
+            return ImageFont.truetype(font_path, size)
+        except (OSError, IOError):
+            continue
+    
+    # If no fonts found, use default
+    st.warning(f"⚠️ Font {font_name} not found. Using default font.")
+    return ImageFont.load_default()
 
 # Template 1: Modern Professional (Enhanced)
 def create_template_modern(business_type, headline, description, phone_number, colors):
@@ -292,6 +304,20 @@ def create_social_media_graphic(template_type, business_type, headline, descript
         "HVAC": {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)},
         "Electrical": {"primary": (110, 25, 140), "secondary": (160, 90, 180), "accent": (255, 214, 0)}
     }
+    
+    # Get colors for the business type
+    colors = color_schemes.get(business_type, color_schemes["Plumbing"])
+    
+    # Call the appropriate template function
+    if template_type == "Modern Professional":
+        return create_template_modern(business_type, headline, description, phone_number, colors)
+    elif template_type == "Clean & Minimal":
+        return create_template_minimal(business_type, headline, description, phone_number, colors)
+    elif template_type == "Bold & Energetic":
+        return create_template_bold(business_type, headline, description, phone_number, colors)
+    else:
+        # Default to modern professional
+        return create_template_modern(business_type, headline, description, phone_number, colors)
 # Sidebar
 with st.sidebar:
     st.header("💰 Pricing")
