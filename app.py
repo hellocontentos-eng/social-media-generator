@@ -52,21 +52,22 @@ def debug_font_loading():
 debug_font_loading()
 
 # Simple local background system (FREE & RELIABLE)
+
 BACKGROUND_CACHE = {
     "Plumbing": [
-        "backgrounds/plumbing_bg1.jpg"  # Only use the image you actually have
+        "backgrounds/plumbing_bg1.jpg"
     ],
     "Cleaning": [
-        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
+        "backgrounds/cleaning_bg1.jpg"  # Your actual cleaning image
     ],
     "HVAC": [
-        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
+        "backgrounds/hvac_bg1.jpg"      # Your actual HVAC image
     ],
     "Electrical": [
-        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
+        "backgrounds/electrical_bg1.jpg" # Your actual electrical image
     ],
     "Landscaping": [
-        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
+        "backgrounds/landscaping_bg1.jpg" # Your actual landscaping image
     ]
 }
 
@@ -109,29 +110,20 @@ def load_background_image(business_type):
         # If local file fails, use fallback background
         return create_fallback_background(business_type)
         
-
-# PRE-GENERATED BACKGROUND CACHE (generate these once, use forever)
-    
 def load_font(font_name, size):
-    """Improved font loading with fallbacks"""
-    system_fonts = {
-        "Montserrat-Bold.ttf": "arialbd.ttf",
-        "Montserrat-Medium.ttf": "arial.ttf", 
-        "Montserrat-Regular.ttf": "arial.ttf",
-        "Montserrat-SemiBold.ttf": "arialbd.ttf",
-        "Montserrat-Light.ttf": "arial.ttf",
-        "Montserrat-ExtraBold.ttf": "arialbd.ttf"
-    }
-    
-    system_font = system_fonts.get(font_name, "arial.ttf")
-    
+    """Load fonts from your fonts folder"""
     try:
-        return ImageFont.truetype(system_font, size)
-    except:
+        font_path = f"fonts/{font_name}"
+        return ImageFont.truetype(font_path, size)
+    except Exception as e:
+        # If specific font fails, try to load any available font
         try:
-            return ImageFont.truetype("arial.ttf", size)
+            return ImageFont.truetype("fonts/Montserrat-Regular.ttf", size)
         except:
-            return ImageFont.load_default()
+            try:
+                return ImageFont.truetype("arial.ttf", size)
+            except:
+                return ImageFont.load_default()
 
 # Enhanced Template Functions with AI backgrounds
 def create_template_modern(business_type, headline, description, phone_number, colors):
@@ -310,12 +302,11 @@ with metric_col2:
 with metric_col3:
     st.metric("Time Saved", "2,100+ hours")
 
-# EXAMPLE GALLERY - SIMPLE VERSION
+# EXAMPLE GALLERY
 st.subheader("🎨 See What You'll Create")
 
-# Just show that templates work - use actual template function
+# Create actual sample graphics using your template function
 try:
-    # Create actual graphics using your template functions
     sample1 = create_template_modern(
         "Plumbing",
         "24/7 Emergency Plumbing", 
@@ -325,16 +316,16 @@ try:
     )
     
     sample2 = create_template_modern(
-        "Cleaning",
+        "Cleaning", 
         "Sparkling Clean Results",
-        "Professional cleaning services for homes and offices", 
-        "(555) 123-CLEAN",
+        "Professional cleaning services for homes and offices",
+        "(555) 123-CLEAN", 
         {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)}
     )
     
     sample3 = create_template_modern(
-        "HVAC", 
-        "HVAC Experts On Call",
+        "HVAC",
+        "HVAC Experts On Call", 
         "Heating and cooling solutions you can trust",
         "(555) 123-HVAC",
         {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)}
@@ -344,33 +335,20 @@ try:
     with col1:
         st.image(sample1, caption="Professional Plumbing Post", use_column_width=True)
     with col2:
-        st.image(sample2, caption="Cleaning Service Post", use_column_width=True)
+        st.image(sample2, caption="Cleaning Service Post", use_column_width=True) 
     with col3:
         st.image(sample3, caption="HVAC Service Post", use_column_width=True)
         
 except Exception as e:
-    st.error(f"Gallery creation failed: {e}")
-    # Fallback
+    st.error(f"Could not create sample graphics: {e}")
+    # Simple fallback - just show the different backgrounds
     col1, col2, col3 = st.columns(3)
     with col1:
         st.image("backgrounds/plumbing_bg1.jpg", caption="Professional Plumbing Post")
     with col2:
-        st.image("backgrounds/plumbing_bg1.jpg", caption="Cleaning Service Post")
+        st.image("backgrounds/cleaning_bg1.jpg", caption="Cleaning Service Post")
     with col3:
-        st.image("backgrounds/plumbing_bg1.jpg", caption="HVAC Service Post")
-st.markdown("---")
-st.subheader("🚀 How It Works - 3 Simple Steps")
-steps_col1, steps_col2, steps_col3 = st.columns(3)
-with steps_col1:
-    st.markdown("### 1. 📝 Enter Your Details")
-    st.write("Business type, phone, custom text")
-with steps_col2:
-    st.markdown("### 2. 🎨 Choose Template")  
-    st.write("Pick from professional designs")
-with steps_col3:
-    st.markdown("### 3. 📥 Download & Post")
-    st.write("Ready-to-use social media graphic")
-
+        st.image("backgrounds/hvac_bg1.jpg", caption="HVAC Service Post")
 # TESTIMONIALS
 st.subheader("💬 What Business Owners Say")
 testimonial_col1, testimonial_col2 = st.columns(2)
