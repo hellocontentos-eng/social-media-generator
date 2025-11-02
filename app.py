@@ -48,7 +48,6 @@ BACKGROUND_LIBRARY = {
     ]
 }
 
-# Smart content generation with Gemini
 def generate_ai_content(business_type, content_type="headline"):
     """Smart AI content generation that finds a working model"""
     
@@ -84,8 +83,6 @@ def generate_ai_content(business_type, content_type="headline"):
         
     except Exception as e:
         st.error(f"❌ Model discovery failed: {e}")
-        return get_fallback_content(business_type, content_type)ash failed: {str(e)[:100]}...")
-        # Use enhanced fallback content
         return get_fallback_content(business_type, content_type)
 
 def get_fallback_content(business_type, content_type):
@@ -116,32 +113,6 @@ def get_fallback_content(business_type, content_type):
         "headline": f"Professional {business_type} Services",
         "description": f"Expert {business_type} solutions with quality guaranteed!"
     })[content_type]
-
-def get_fallback_content(business_type, content_type):
-    """Enhanced fallback content"""
-    fallback_content = {
-        "Plumbing": {
-            "headline": "🚰 Emergency Plumbing Services - 24/7 Available",
-            "description": "Fast, reliable plumbing solutions! Licensed & insured professionals."
-        },
-        "Cleaning": {
-            "headline": "✨ Sparkling Clean Results Guaranteed",
-            "description": "Professional cleaning services for homes & offices. Eco-friendly products!"
-        },
-        "HVAC": {
-            "headline": "❄️ HVAC Services & System Maintenance",
-            "description": "Stay comfortable year-round with expert heating & cooling services."
-        },
-        "Electrical": {
-            "headline": "⚡ Licensed Electrical Services & Repairs", 
-            "description": "Safe, reliable electrical solutions for homes and businesses."
-        },
-        "Landscaping": {
-            "headline": "🌿 Beautiful Landscaping & Lawn Care",
-            "description": "Transform your outdoor space with professional landscaping services."
-        }
-    }
-    return fallback_content.get(business_type, {"headline": "Professional Services", "description": "Quality work guaranteed!"})[content_type]
 
 def load_background_image(business_type):
     """Load a random background image for the business type"""
