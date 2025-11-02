@@ -424,15 +424,15 @@ with tab2:
 st.success("✨ Ready to generate professional social media graphics!")
     
         # Default content ideas (no AI)
-        default_ideas = [
-            "Monday: Service highlight of the week",
-            "Tuesday: Customer testimonial showcase", 
-            "Wednesday: Educational tip or DIY warning",
-            "Thursday: Before/after transformation",
-            "Friday: Weekend special offer",
-            "Saturday: Team spotlight or hiring",
-            "Sunday: Industry news or maintenance tip"
-        ]
+    default_ideas = [
+        "Monday: Service highlight of the week",
+        "Tuesday: Customer testimonial showcase", 
+        "Wednesday: Educational tip or DIY warning",
+        "Thursday: Before/after transformation",
+        "Friday: Weekend special offer",
+        "Saturday: Team spotlight or hiring",
+        "Sunday: Industry news or maintenance tip"
+    ]
     
     for idea in default_ideas:
         st.write(f"✅ {idea}")
