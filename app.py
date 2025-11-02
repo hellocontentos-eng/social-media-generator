@@ -33,9 +33,9 @@ st.markdown("---")
 # ---------------- Sidebar ----------------
 with st.sidebar:
     st.header("💰 Pricing")
-    st.write("**Free:** 10 graphics/month", key="sidebar_free_plan")
-    st.write("**Pro ($29/month):** Unlimited + AI Content", key="sidebar_pro_plan")
-    st.write("**Business ($49/month):** White labeling", key="sidebar_business_plan")
+    st.write("**Free:** 10 graphics/month")
+    st.write("**Pro ($29/month):** Unlimited + AI Content")
+    st.write("**Business ($49/month):** White labeling")
     
     st.header("💳 Upgrade Now")
     if st.button("Start $29/month Pro Plan", key="sidebar_pro_upgrade"):
