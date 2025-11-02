@@ -38,7 +38,7 @@ with tab1:
             ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
             key="business_type_main"
         )            
-        )
+        
         
         # ... REST OF YOUR EXISTING GENERATOR CODE ...
         # Copy all your current form code here
