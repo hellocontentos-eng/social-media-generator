@@ -253,6 +253,10 @@ with st.sidebar:
     st.header("💡 Need Help?")
     st.write("Email: hello.contentos@gmail.com")
     st.write("24-48 hour response time")
+
+# Main content
+tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
+
 with tab1:
     col1, col2 = st.columns([2, 1])
     
