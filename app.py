@@ -423,28 +423,26 @@ with tab2:
 
 st.success("✨ Ready to generate professional social media graphics!")
     
-    if st.button("Generate AI Content Calendar", key="ai_calendar"):
-        with st.spinner("Creating smart content calendar..."):
-            content_ideas = []
-            days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-            
-            for day in days:
-                idea_prompt = f"Create a social media post idea for a {business_type} business for {day}. Make it engaging and specific to this business type."
-                try:
-                    ai_idea = generate_ai_content(business_type, "headline")  # Reusing for ideas
-                    content_ideas.append(f"{day}: {ai_idea}")
-                except:
-                    content_ideas.append(f"{day}: Service highlight and special offer")
-            
-            for idea in content_ideas:
-                st.write(f"✅ {idea}")
-            
-            st.download_button(
-                label="📥 Download Content Calendar",
-                data=json.dumps(content_ideas, indent=2),
-                file_name=f"{business_type}_content_calendar.json",
-                mime="application/json"
-            )
+        # Default content ideas (no AI)
+    default_ideas = [
+        "Monday: Service highlight of the week",
+        "Tuesday: Customer testimonial showcase", 
+        "Wednesday: Educational tip or DIY warning",
+        "Thursday: Before/after transformation",
+        "Friday: Weekend special offer",
+        "Saturday: Team spotlight or hiring",
+        "Sunday: Industry news or maintenance tip"
+    ]
+    
+    for idea in default_ideas:
+        st.write(f"✅ {idea}")
+    
+    st.download_button(
+        label="📥 Download Content Calendar",
+        data=json.dumps(default_ideas, indent=2),
+        file_name=f"{business_type}_content_calendar.json",
+        mime="application/json"
+    )
     else:
         # Default content ideas
         default_ideas = [
