@@ -12,16 +12,7 @@ st.set_page_config(
     page_icon="🎯",
     layout="wide"
 )
-# Add at the top after hero section
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.page_link("#create-your-first-graphic-now", label="🎨 Create Graphic")
-with col2:
-    st.page_link("#see-what-youll-create", label="📸 Examples") 
-with col3:
-    st.page_link("#what-business-owners-say", label="💬 Reviews")
-with col4:
-    st.page_link("#choose-your-plan", label="💰 Pricing")
+
     
 # HERO SECTION (your current code)
 st.markdown("""
