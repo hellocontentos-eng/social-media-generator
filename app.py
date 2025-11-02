@@ -127,46 +127,45 @@ def load_font(font_name, size):
 
 # Enhanced Template Functions with AI backgrounds
 def create_template_modern(business_type, headline, description, phone_number, colors):
-    """Modern Professional Template with better layout"""
+    """Modern Professional Template with proper text spacing"""
     try:
         # Load background image
         background = load_background_image(business_type)
         draw = ImageDraw.Draw(background)
         
-        # Lighter overlay
-        overlay = Image.new('RGBA', background.size, (255, 255, 255, 100))  # Even lighter
+        # Light overlay
+        overlay = Image.new('RGBA', background.size, (255, 255, 255, 80))
         background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(background)
         
-        # MAIN HEADLINE (Largest & Most Important)
-        headline_font = load_font("Montserrat-Bold.ttf", 100)  # Increased size
+        # 1. MAIN HEADLINE (Top Section)
+        headline_font = load_font("Montserrat-Bold.ttf", 90)
         wrapped_headline = textwrap.fill(headline, width=12)
-        draw.text((540, 200), wrapped_headline, fill=colors["primary"], 
+        draw.text((540, 180), wrapped_headline, fill=colors["primary"], 
                   font=headline_font, anchor="mm", align="center", 
                   stroke_width=3, stroke_fill=(255, 255, 255))
         
-        # BUSINESS TYPE (Smaller, as subtitle)
-        badge_font = load_font("Montserrat-Medium.ttf", 42)  # Smaller than headline
+        # 2. BUSINESS TYPE (Below Headline - Proper Spacing)
+        badge_font = load_font("Montserrat-Medium.ttf", 38)
         badge_text = f"{business_type.upper()} SERVICES"
-        draw.text((540, 320), badge_text, fill=colors["accent"], 
+        draw.text((540, 300), badge_text, fill=colors["accent"], 
                   font=badge_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
         
-        # DESCRIPTION (Clean & Readable)
-        desc_font = load_font("Montserrat-Regular.ttf", 48)  # Larger description
-        wrapped_desc = textwrap.fill(description, width=22)  # Better line breaks
+        # 3. DESCRIPTION (Middle Section - Good Spacing)
+        desc_font = load_font("Montserrat-Regular.ttf", 42)
+        wrapped_desc = textwrap.fill(description, width=24)
         
-        # Description background for readability
-        desc_bbox = draw.multiline_textbbox((540, 480), wrapped_desc, font=desc_font, anchor="mm")
+        # Description background
+        desc_bbox = draw.multiline_textbbox((540, 450), wrapped_desc, font=desc_font, anchor="mm")
         padding = 20
         draw.rectangle([desc_bbox[0]-padding, desc_bbox[1]-padding, desc_bbox[2]+padding, desc_bbox[3]+padding], 
                        fill=(255, 255, 255, 230), outline=colors["primary"], width=2)
         
-        draw.multiline_text((540, 480), wrapped_desc, fill=(50, 50, 50), 
+        draw.multiline_text((540, 450), wrapped_desc, fill=(50, 50, 50), 
                            font=desc_font, anchor="mm", align="center")
         
-        # CONTACT SECTION (Clear & Prominent)
-        contact_font = load_font("Montserrat-SemiBold.ttf", 52)
-        # Better phone formatting - use "Call Now" instead of icon
+        # 4. CONTACT SECTION (Bottom Section - Ample Spacing)
+        contact_font = load_font("Montserrat-SemiBold.ttf", 46)
         contact_text = f"Call Now: {phone_number}"
         draw.text((540, 650), contact_text, fill=colors["primary"], 
                   font=contact_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
@@ -176,7 +175,6 @@ def create_template_modern(business_type, headline, description, phone_number, c
     except Exception as e:
         st.error(f"Error in modern template: {e}")
         return None
-
 def create_template_minimal(business_type, headline, description, phone_number, colors):
     """Clean & Minimal Template with AI background"""
     try:
@@ -310,25 +308,25 @@ st.subheader("🎨 See What You'll Create")
 try:
     sample1 = create_template_modern(
         "Plumbing",
-        "Emergency Plumbing",  # Shorter, cleaner
-        "Fast solutions when you need them most",  # Better description
-        "(555) 123-4567",  # Normal phone format
+        "Emergency Plumbing",  # Shorter
+        "Fast & reliable service",  # Shorter
+        "(555) 123-4567",
         {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)}
     )
-    
+
     sample2 = create_template_modern(
         "Cleaning", 
-        "Sparkling Clean",  # Cleaner headline
-        "Professional results every time",  # Better description
-        "(555) 123-4567",  # Normal phone format
+        "Sparkling Clean",
+        "Professional results",  # Shorter
+        "(555) 123-4567",
         {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)}
     )
-    
+
     sample3 = create_template_modern(
         "HVAC",
-        "Climate Control",  # Better headline
-        "Comfort you can count on",  # Better description  
-        "(555) 123-4567",  # Normal phone format
+        "Climate Experts",  # Shorter
+        "Comfort you can trust",  # Shorter
+        "(555) 123-4567",
         {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)}
     )
     
