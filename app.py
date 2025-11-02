@@ -16,6 +16,41 @@ st.set_page_config(
     layout="wide"
 )
 
+# TEMPORARY DEBUG FUNCTION
+def debug_font_loading():
+    st.sidebar.header("🔍 Debug Font Loading")
+    
+    # Test font loading
+    try:
+        test_font = ImageFont.truetype("arial.ttf", 60)
+        st.sidebar.success("✅ Arial font loaded")
+    except:
+        st.sidebar.error("❌ Arial font failed")
+    
+    try:
+        test_font = ImageFont.truetype("arialbd.ttf", 60) 
+        st.sidebar.success("✅ Arial Bold font loaded")
+    except:
+        st.sidebar.error("❌ Arial Bold font failed")
+    
+    # Test if templates work
+    if st.sidebar.button("Test Template Creation"):
+        try:
+            test_image = create_template_modern(
+                "Plumbing", 
+                "TEST LARGE HEADLINE", 
+                "This is a test description to check readability", 
+                "(555) 123-4567",
+                {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)}
+            )
+            st.sidebar.image(test_image, caption="Template Test", use_column_width=True)
+            st.sidebar.success("✅ Template works!")
+        except Exception as e:
+            st.sidebar.error(f"❌ Template failed: {e}")
+
+# Call the debug function
+debug_font_loading()
+
 # Simple local background system (FREE & RELIABLE)
 BACKGROUND_CACHE = {
     "Plumbing": [
@@ -275,62 +310,47 @@ with metric_col2:
 with metric_col3:
     st.metric("Time Saved", "2,100+ hours")
 
-# EXAMPLE GALLERY
+# EXAMPLE GALLERY - SIMPLE VERSION
 st.subheader("🎨 See What You'll Create")
 
-# Create sample graphics to show users
+# Just show that templates work - use actual template function
 try:
-    # Sample 1: Plumbing
-    sample_bg1 = load_background_image("Plumbing")
-    draw1 = ImageDraw.Draw(sample_bg1)
-    headline_font = load_font("Montserrat-Bold.ttf", 80)  # Increased from 60
-    phone_font = load_font("Montserrat-Bold.ttf", 50)     # Larger phone number
+    # Create actual graphics using your template functions
+    sample1 = create_template_modern(
+        "Plumbing",
+        "24/7 Emergency Plumbing", 
+        "Fast, reliable solutions for all your plumbing needs",
+        "(555) 123-PLUMB",
+        {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)}
+    )
     
-    draw1.text((540, 300), "24/7 Plumbing\nServices", fill=(255, 255, 255), 
-               font=headline_font, anchor="mm", align="center", stroke_width=3, stroke_fill=(0, 0, 0))
-    draw1.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), 
-               font=phone_font, anchor="mm", stroke_width=2, stroke_fill=(0, 0, 0))
+    sample2 = create_template_modern(
+        "Cleaning",
+        "Sparkling Clean Results",
+        "Professional cleaning services for homes and offices", 
+        "(555) 123-CLEAN",
+        {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)}
+    )
     
-    # Sample 2: Cleaning
-    sample_bg2 = load_background_image("Cleaning") 
-    draw2 = ImageDraw.Draw(sample_bg2)
-    draw2.text((540, 300), "Sparkling Clean\nResults", fill=(255, 255, 255), 
-               font=headline_font, anchor="mm", align="center", stroke_width=3, stroke_fill=(0, 0, 0))
-    draw2.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), 
-               font=phone_font, anchor="mm", stroke_width=2, stroke_fill=(0, 0, 0))
+    sample3 = create_template_modern(
+        "HVAC", 
+        "HVAC Experts On Call",
+        "Heating and cooling solutions you can trust",
+        "(555) 123-HVAC",
+        {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)}
+    )
     
-    # Sample 3: HVAC
-    sample_bg3 = load_background_image("HVAC")
-    draw3 = ImageDraw.Draw(sample_bg3)
-    draw3.text((540, 300), "HVAC Experts\n24/7 Service", fill=(255, 255, 255), 
-               font=headline_font, anchor="mm", align="center", stroke_width=3, stroke_fill=(0, 0, 0))
-    draw3.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), 
-               font=phone_font, anchor="mm", stroke_width=2, stroke_fill=(0, 0, 0))
-    
-    # Display the sample graphics
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image(sample_bg1, caption="Professional Plumbing Post", use_column_width=True)
+        st.image(sample1, caption="Professional Plumbing Post", use_column_width=True)
     with col2:
-        st.image(sample_bg2, caption="Cleaning Service Post", use_column_width=True)
+        st.image(sample2, caption="Cleaning Service Post", use_column_width=True)
     with col3:
-        st.image(sample_bg3, caption="HVAC Service Post", use_column_width=True)
+        st.image(sample3, caption="HVAC Service Post", use_column_width=True)
         
 except Exception as e:
-    st.error(f"Could not create sample graphics: {e}")
-    
-    # Display the sample graphics
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.image(sample_bg1, caption="Professional Plumbing Post", use_column_width=True)
-    with col2:
-        st.image(sample_bg2, caption="Cleaning Service Post", use_column_width=True)
-    with col3:
-        st.image(sample_bg3, caption="HVAC Service Post", use_column_width=True)
-        
-except Exception as e:
-    st.error(f"Could not create sample graphics: {e}")
-    # Fallback: just show plain backgrounds
+    st.error(f"Gallery creation failed: {e}")
+    # Fallback
     col1, col2, col3 = st.columns(3)
     with col1:
         st.image("backgrounds/plumbing_bg1.jpg", caption="Professional Plumbing Post")
@@ -338,7 +358,6 @@ except Exception as e:
         st.image("backgrounds/plumbing_bg1.jpg", caption="Cleaning Service Post")
     with col3:
         st.image("backgrounds/plumbing_bg1.jpg", caption="HVAC Service Post")
-
 st.markdown("---")
 st.subheader("🚀 How It Works - 3 Simple Steps")
 steps_col1, steps_col2, steps_col3 = st.columns(3)
