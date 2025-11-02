@@ -33,36 +33,16 @@ with metric_col2:
     st.metric("Businesses Helped", "250+")
 with metric_col3:
     st.metric("Time Saved", "2,100+ hours")
-# ========== ADD GENERATOR FORM RIGHT HERE ==========
-st.header("🎨 Create Your First Graphic Now!")
 
-tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
-
-with tab1:
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        business_type = st.selectbox(
-            "Business Type:",
-            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-            key="business_type_quick"
-        )            
-        
-        
-        # ... REST OF YOUR EXISTING GENERATOR CODE ...
-        # Copy all your current form code here
-
-# EXAMPLE GALLERY - Add before the form
-# Replace the broken image URLs with these working ones:
+# EXAMPLE GALLERY - Replace with working images
 st.subheader("🎨 See What You'll Create")
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.image("https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300", caption="Professional Plumbing Post")
+    st.image("https://picsum.photos/300/300?random=1", caption="Professional Plumbing Post")
 with col2:
-    st.image("https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=300", caption="Cleaning Service Post")
+    st.image("https://picsum.photos/300/300?random=2", caption="Cleaning Service Post") 
 with col3:
-    st.image("https://images.unsplash.com/photo-1581993192008-63fd1ea7de1a?w=300", caption="HVAC Service Post")
-    
+    st.image("https://picsum.photos/300/300?random=3", caption="HVAC Service Post")
 
 st.markdown("---")
 st.subheader("🚀 How It Works - 3 Simple Steps")
