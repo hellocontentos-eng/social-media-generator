@@ -5,12 +5,9 @@ import textwrap
 import random
 import json
 from datetime import datetime, timedelta
-import replicate
 import requests
 import time
 from io import BytesIO
-
-replicate_client = replicate.Client(api_token=st.secrets["REPLICATE_API_TOKEN"])
 
 # App configuration
 st.set_page_config(
@@ -19,143 +16,44 @@ st.set_page_config(
     layout="wide"
 )
 
-import replicate
-import time
-
-# Configure Replicate
-replicate_client = replicate.Client(api_token=st.secrets["REPLICATE_API_TOKEN"])
-
-# PRE-GENERATED BACKGROUND CACHE (generate these once, use forever)
+# Simple local background system (FREE & RELIABLE)
 BACKGROUND_CACHE = {
     "Plumbing": [
-        "https://replicate.delivery/pbxt/ABC123/plumbing_bg1.png",  # Will replace with actual generated URLs
-        "https://replicate.delivery/pbxt/ABC124/plumbing_bg2.png",
-        "https://replicate.delivery/pbxt/ABC125/plumbing_bg3.png",
-        "https://replicate.delivery/pbxt/ABC126/plumbing_bg4.png",
-        "https://replicate.delivery/pbxt/ABC127/plumbing_bg5.png"
+        "backgrounds/plumbing_bg1.jpg",
+        "backgrounds/plumbing_bg2.jpg", 
+        "backgrounds/plumbing_bg3.jpg",
+        "backgrounds/plumbing_bg4.jpg",
+        "backgrounds/plumbing_bg5.jpg"
     ],
     "Cleaning": [
-        "https://replicate.delivery/pbxt/DEF123/cleaning_bg1.png",
-        "https://replicate.delivery/pbxt/DEF124/cleaning_bg2.png",
-        "https://replicate.delivery/pbxt/DEF125/cleaning_bg3.png",
-        "https://replicate.delivery/pbxt/DEF126/cleaning_bg4.png",
-        "https://replicate.delivery/pbxt/DEF127/cleaning_bg5.png"
+        "backgrounds/cleaning_bg1.jpg",
+        "backgrounds/cleaning_bg2.jpg",
+        "backgrounds/cleaning_bg3.jpg", 
+        "backgrounds/cleaning_bg4.jpg",
+        "backgrounds/cleaning_bg5.jpg"
     ],
     "HVAC": [
-        "https://replicate.delivery/pbxt/GHI123/hvac_bg1.png",
-        "https://replicate.delivery/pbxt/GHI124/hvac_bg2.png",
-        "https://replicate.delivery/pbxt/GHI125/hvac_bg3.png",
-        "https://replicate.delivery/pbxt/GHI126/hvac_bg4.png",
-        "https://replicate.delivery/pbxt/GHI127/hvac_bg5.png"
+        "backgrounds/hvac_bg1.jpg",
+        "backgrounds/hvac_bg2.jpg",
+        "backgrounds/hvac_bg3.jpg",
+        "backgrounds/hvac_bg4.jpg",
+        "backgrounds/hvac_bg5.jpg"
     ],
     "Electrical": [
-        "https://replicate.delivery/pbxt/JKL123/electrical_bg1.png",
-        "https://replicate.delivery/pbxt/JKL124/electrical_bg2.png",
-        "https://replicate.delivery/pbxt/JKL125/electrical_bg3.png",
-        "https://replicate.delivery/pbxt/JKL126/electrical_bg4.png",
-        "https://replicate.delivery/pbxt/JKL127/electrical_bg5.png"
+        "backgrounds/electrical_bg1.jpg",
+        "backgrounds/electrical_bg2.jpg",
+        "backgrounds/electrical_bg3.jpg",
+        "backgrounds/electrical_bg4.jpg",
+        "backgrounds/electrical_bg5.jpg"
     ],
     "Landscaping": [
-        "https://replicate.delivery/pbxt/MNO123/landscaping_bg1.png",
-        "https://replicate.delivery/pbxt/MNO124/landscaping_bg2.png",
-        "https://replicate.delivery/pbxt/MNO125/landscaping_bg3.png",
-        "https://replicate.delivery/pbxt/MNO126/landscaping_bg4.png",
-        "https://replicate.delivery/pbxt/MNO127/landscaping_bg5.png"
+        "backgrounds/landscaping_bg1.jpg",
+        "backgrounds/landscaping_bg2.jpg",
+        "backgrounds/landscaping_bg3.jpg",
+        "backgrounds/landscaping_bg4.jpg",
+        "backgrounds/landscaping_bg5.jpg"
     ]
 }
-
-def generate_and_cache_backgrounds():
-    """ONE-TIME FUNCTION to generate all backgrounds (run locally, then update cache)"""
-    business_types = ["Plumbing", "Cleaning", "HVAC", "Electrical", "Landscaping"]
-    
-    for business_type in business_types:
-        st.write(f"🎨 Generating backgrounds for {business_type}...")
-        
-        backgrounds = []
-        for i in range(5):  # Generate 5 backgrounds per business type
-            try:
-                background = generate_single_background(business_type, i)
-                backgrounds.append(background)
-                st.write(f"  ✅ Background {i+1} generated")
-                time.sleep(2)  # Avoid rate limits
-            except Exception as e:
-                st.error(f"Failed to generate background {i+1} for {business_type}: {e}")
-                # Add fallback background
-                backgrounds.append(create_fallback_background(business_type))
-        
-        BACKGROUND_CACHE[business_type] = backgrounds
-    
-    st.success("🎉 All backgrounds generated and cached!")
-
-def generate_single_background(business_type, variation):
-    """Generate one professional abstract background"""
-    
-    prompt_variations = {
-        "Plumbing": [
-            "abstract fluid water flow patterns, blue and silver tones, professional business background, clean modern design, minimalist, corporate marketing graphic, high quality, 4k",
-            "modern liquid dynamics abstraction, deep blue tones, professional plumbing background, sleek business design, water theme, minimalist, vector art",
-            "contemporary fluid mechanics art, blue and white tones, business marketing background, clean pipes and flow design, abstract, professional",
-            "water flow abstraction, aqua blue tones, corporate background, modern plumbing theme, clean lines, business graphic",
-            "liquid motion patterns, navy blue and silver, professional service background, abstract water design, marketing material"
-        ],
-        "Cleaning": [
-            "abstract sparkling clean bubbles and waves, white and light green tones, professional hygiene background, pristine clean design, business marketing, minimalist, 4k",
-            "modern cleaning abstraction, fresh green and white tones, professional service background, sparkling clean theme, corporate design, vector art",
-            "contemporary purity patterns, mint green tones, business cleaning background, sterile clean design, abstract, professional",
-            "bubble and foam abstraction, white and teal tones, corporate background, modern cleaning theme, pristine design, business graphic",
-            "sparkling clean patterns, light green and white, professional service background, abstract hygiene design, marketing material"
-        ],
-        "HVAC": [
-            "abstract air flow and temperature patterns, blue and white swirls, professional climate control background, modern corporate design, 4k",
-            "modern temperature dynamics, cool blue tones, HVAC business background, air flow theme, minimalist, vector art",
-            "contemporary climate control abstraction, blue and gray tones, professional service background, ventilation design, abstract",
-            "air flow patterns, sky blue tones, corporate background, modern HVAC theme, clean lines, business graphic",
-            "temperature gradient abstraction, blue and silver tones, professional service background, abstract climate design, marketing material"
-        ],
-        "Electrical": [
-            "abstract energy flow and circuit patterns, purple and gold lightning effects, professional electrical background, modern tech design, 4k",
-            "modern energy dynamics, purple and yellow tones, electrical business background, power flow theme, minimalist, vector art",
-            "contemporary circuit abstraction, violet and gold tones, professional service background, electronic design, abstract",
-            "energy flow patterns, deep purple tones, corporate background, modern electrical theme, tech design, business graphic",
-            "lightning and power abstraction, purple and amber tones, professional service background, abstract energy design, marketing material"
-        ],
-        "Landscaping": [
-            "abstract organic growth and nature patterns, green and earth tones, professional landscaping background, natural business design, 4k",
-            "modern nature dynamics, forest green tones, landscaping business background, growth theme, minimalist, vector art",
-            "contemporary garden abstraction, green and brown tones, professional service background, organic design, abstract",
-            "growth patterns, earthy green tones, corporate background, modern landscaping theme, natural design, business graphic",
-            "organic shapes abstraction, green and terracotta tones, professional service background, abstract nature design, marketing material"
-        ]
-    }
-    
-    prompts = prompt_variations.get(business_type, ["abstract professional business background, modern corporate design, 4k"])
-    prompt = prompts[variation % len(prompts)]
-    
-    try:
-        output = replicate_client.run(
-            "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
-            input={
-                "prompt": prompt,
-                "negative_prompt": "text, words, letters, people, faces, buildings, realistic photos, messy, cluttered, ugly, blurry",
-                "width": 1080,
-                "height": 1080,
-                "num_outputs": 1,
-                "guidance_scale": 7.5,
-                "num_inference_steps": 25
-            }
-        )
-        
-        if output and len(output) > 0:
-            image_url = output[0]
-            response = requests.get(image_url)
-            if response.status_code == 200:
-                image = Image.open(BytesIO(response.content))
-                return image
-                
-    except Exception as e:
-        st.error(f"Background generation failed: {e}")
-    
-    return create_fallback_background(business_type)
 
 def create_fallback_background(business_type):
     """Create professional CSS-style background as fallback"""
@@ -183,19 +81,19 @@ def create_fallback_background(business_type):
     return image
 
 def load_background_image(business_type):
-    """Load random background from cache (NO API COSTS!)"""
+    """Load random background from local files (FREE & RELIABLE)"""
     backgrounds = BACKGROUND_CACHE.get(business_type, BACKGROUND_CACHE["Plumbing"])
-    background_url = random.choice(backgrounds)
+    background_path = random.choice(backgrounds)
     
     try:
-        response = requests.get(background_url)
-        if response.status_code == 200:
-            return Image.open(BytesIO(response.content)).resize((1080, 1080))
-    except:
-        pass
-    
-    # Fallback to generated background if cache fails
-    return create_fallback_background(business_type)
+        image = Image.open(background_path)
+        return image.resize((1080, 1080))
+    except Exception as e:
+        # If local file fails, use fallback background
+        return create_fallback_background(business_type)
+        
+
+# PRE-GENERATED BACKGROUND CACHE (generate these once, use forever)
     
 def load_font(font_name, size):
     """Improved font loading with fallbacks"""
