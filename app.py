@@ -6,6 +6,9 @@ import random
 import json
 from datetime import datetime, timedelta
 import google.generativeai as genai
+# Ensure you’re on the new API
+import google.ai.generativelanguage as glm
+
 import requests
 from io import BytesIO
 
