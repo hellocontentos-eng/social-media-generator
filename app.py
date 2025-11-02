@@ -43,7 +43,10 @@ def create_template_modern(business_type, headline, description, phone_number, c
         b = int(colors["primary"][2]*(1-i/height) + 230*(i/height))
         draw.line([(0,i),(width,i)], fill=(r,g,b))
 
-    headline_font = load_font("arial.ttf", 48)
+    headline_font = ImageFont.truetype("fonts/Montserrat-Bold.ttf", 48)
+    desc_font     = ImageFont.truetype("fonts/Montserrat-Regular.ttf", 28)
+    phone_font    = ImageFont.truetype("fonts/Montserrat-SemiBold.ttf", 32)
+
     wrapped_headline = textwrap.fill(headline, width=20)
     draw.text((width//2,100), wrapped_headline, fill=(0,0,0), anchor="mm", align="center")
 
