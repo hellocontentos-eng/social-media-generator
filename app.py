@@ -1,16 +1,4 @@
-import streamlit as st
-import os
-from PIL import Image, ImageDraw, ImageFont
-import textwrap
-import random
-import json
-from datetime import datetime, timedelta
-import requests
-import time
-from io import BytesIO
-import plotly.graph_objects as go
-import plotly.io as pio
-import base64
+Could not create sample graphics: name 'create_plotly_template' is not defined
 
 # App configuration
 st.set_page_config(
