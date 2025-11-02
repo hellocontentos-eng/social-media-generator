@@ -85,10 +85,15 @@ def load_background_image(business_type):
     backgrounds = BACKGROUND_CACHE.get(business_type, BACKGROUND_CACHE["Plumbing"])
     background_path = random.choice(backgrounds)
     
+    # DEBUG: Show what path is being used
+    st.write(f"🔍 Trying to load: {background_path}")
+    
     try:
         image = Image.open(background_path)
+        st.write(f"✅ Successfully loaded: {background_path}")
         return image.resize((1080, 1080))
     except Exception as e:
+        st.error(f"❌ Failed to load {background_path}: {e}")
         # If local file fails, use fallback background
         return create_fallback_background(business_type)
         
@@ -292,11 +297,11 @@ with metric_col3:
 st.subheader("🎨 See What You'll Create")
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.image("https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400", caption="Professional Plumbing Post")
+    st.image("backgrounds/plumbing_bg1.jpg", caption="Professional Plumbing Post")
 with col2:
-    st.image("https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400", caption="Cleaning Service Post") 
+    st.image("backgrounds/plumbing_bg1.jpg", caption="Cleaning Service Post")
 with col3:
-    st.image("https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400", caption="HVAC Service Post")
+    st.image("backgrounds/plumbing_bg1.jpg", caption="HVAC Service Post")
 
 st.markdown("---")
 st.subheader("🚀 How It Works - 3 Simple Steps")
