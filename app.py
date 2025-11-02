@@ -5,10 +5,6 @@ import textwrap
 import random
 import json
 from datetime import datetime, timedelta
-import google.generativeai as genai
-# Ensure you’re on the new API
-import google.ai.generativelanguage as glm
-
 import requests
 from io import BytesIO
 
@@ -52,78 +48,6 @@ BACKGROUND_LIBRARY = {
 }
 
 
-def generate_ai_content(business_type, content_type="headline"):
-    """Generate smart marketing content using available free-tier Gemini models only"""
-
-    content_prompts = {
-        "headline": f"Create a compelling headline for a {business_type} business social media post. Return only headline.",
-        "description": f"Write a short description for a {business_type} company social media post. Return only description.",
-    }
-
-    # STEP 1: Get all available models
-    st.write("🔍 Fetching available Gemini models...")
-    try:
-        models = genai.list_models()
-    except Exception as e:
-        st.error(f"❌ Failed to list models: {e}")
-        return get_fallback_content(business_type, content_type)
-
-    # STEP 2: Filter for models that support generate_content
-    free_models = []
-    for m in models:
-        if "generate_content" in m.available_methods:
-            free_models.append(m.name)
-
-    if not free_models:
-        st.error("❌ No free-tier models available. Using fallback content.")
-        return get_fallback_content(business_type, content_type)
-
-    # STEP 3: Try each free model until one works
-    for model_name in free_models:
-        try:
-            st.write(f"🎯 Trying model: {model_name}")
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(content_prompts[content_type])
-            result = response.text.strip().strip('"')
-            st.success(f"✅ Using model: {model_name}")
-            return result
-        except Exception as e:
-            st.warning(f"❌ {model_name} failed: {e}")
-            continue
-
-    # STEP 4: Fallback if all fail
-    st.error("❌ All models failed. Using fallback content.")
-    return get_fallback_content(business_type, content_type)
-
-
-def get_fallback_content(business_type, content_type):
-    """Enhanced fallback content for when AI fails"""
-    fallback_content = {
-        "Plumbing": {
-            "headline": "🚰 Emergency Plumbing Services - 24/7 Available",
-            "description": "Fast, reliable plumbing solutions! Licensed & insured professionals with upfront pricing."
-        },
-        "Cleaning": {
-            "headline": "✨ Sparkling Clean Results Guaranteed",
-            "description": "Professional cleaning services for homes & offices. Eco-friendly products & satisfaction guaranteed!"
-        },
-        "HVAC": {
-            "headline": "❄️ HVAC Services & System Maintenance",
-            "description": "Stay comfortable year-round with expert heating & cooling services. Emergency repairs available!"
-        },
-        "Electrical": {
-            "headline": "⚡ Licensed Electrical Services & Repairs", 
-            "description": "Safe, reliable electrical solutions for homes and businesses. Code-compliant & insured!"
-        },
-        "Landscaping": {
-            "headline": "🌿 Beautiful Landscaping & Lawn Care",
-            "description": "Transform your outdoor space with professional landscaping services. Free consultations available!"
-        }
-    }
-    return fallback_content.get(business_type, {
-        "headline": f"Professional {business_type} Services",
-        "description": f"Expert {business_type} solutions with quality guaranteed!"
-    })[content_type]
 
 def load_background_image(business_type):
     """Load a random background image for the business type"""
@@ -405,50 +329,10 @@ with tab1:
         )
         
         # AI Content Generation Buttons
-        # AI Content Generation Buttons
-        col_a, col_b = st.columns(2)
-        # AI Content Generation Buttons - DEBUG VERSION
-        col_a, col_b = st.columns(2)
-        with col_a:
-            if st.button("🎯 AI Generate Headline", key="ai_headline"):
-                st.write("🔍 STEP 1: Headline button clicked!")
-                with st.spinner("Generating smart headline..."):
-                    try:
-                        ai_headline = generate_ai_content(business_type, "headline")
-                        st.write(f"🔍 STEP 2: AI returned: '{ai_headline}'")
-                        st.session_state.headline = ai_headline
-                        st.write(f"🔍 STEP 3: Session state set to: '{st.session_state.headline}'")
-                        # st.rerun()  # COMMENTED OUT FOR DEBUGGING
-                        st.write("🔍 STEP 4: Rerun would happen here")
-                    except Exception as e:
-                        st.error(f"❌ AI Headline Error: {e}")
-                        
-        with col_b:
-            if st.button("📝 AI Generate Description", key="ai_desc"):
-                st.write("🔍 STEP 1: Description button clicked!")
-                with st.spinner("Generating compelling description..."):
-                    try:
-                        ai_description = generate_ai_content(business_type, "description")
-                        st.write(f"🔍 STEP 2: AI returned: '{ai_description}'")
-                        st.session_state.description = ai_description
-                        st.write(f"🔍 STEP 3: Session state set to: '{st.session_state.description}'")
-                        # st.rerun()  # COMMENTED OUT FOR DEBUGGING
-                        st.write("🔍 STEP 4: Rerun would happen here")
-                    except Exception as e:
-                        st.error(f"❌ AI Description Error: {e}")
-
-        # Check current session state
-        st.write("🔍 CURRENT SESSION STATE:")
-        st.write(f"Headline: '{st.session_state.get('headline', 'NOT SET')}'")
-        st.write(f"Description: '{st.session_state.get('description', 'NOT SET')}'")
-
+        # Manual Text Input (Clean & Simple)
         phone_number = st.text_input("Phone Number", value="(555) 123-4567", key="phone_main")
-        headline = st.text_input("Headline", 
-                                value=st.session_state.get('headline', f"Professional {business_type} Services"), 
-                                key="headline_main")
-        description = st.text_area("Description", 
-                                  value=st.session_state.get('description', f"Expert {business_type} solutions for your home or business. Quality work guaranteed!"), 
-                                  key="desc_main")
+        headline = st.text_input("Headline", value=f"Professional {business_type} Services", key="headline_main")
+        description = st.text_area("Description", value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed!", key="desc_main")
         
         if st.button("Generate Graphic", type="primary", key="generate_btn"):
             if headline and description and phone_number:
@@ -516,6 +400,29 @@ with tab1:
 with tab2:
     st.header("30-Day Content Ideas")
     
+    # Default content ideas (no AI)
+    default_ideas = [
+        "Monday: Service highlight of the week",
+        "Tuesday: Customer testimonial showcase", 
+        "Wednesday: Educational tip or DIY warning",
+        "Thursday: Before/after transformation",
+        "Friday: Weekend special offer",
+        "Saturday: Team spotlight or hiring",
+        "Sunday: Industry news or maintenance tip"
+    ]
+    
+    for idea in default_ideas:
+        st.write(f"✅ {idea}")
+    
+    st.download_button(
+        label="📥 Download Content Calendar",
+        data=json.dumps(default_ideas, indent=2),
+        file_name=f"{business_type}_content_calendar.json",
+        mime="application/json"
+    )
+
+st.success("✨ Ready to generate professional social media graphics!")
+    
     if st.button("Generate AI Content Calendar", key="ai_calendar"):
         with st.spinner("Creating smart content calendar..."):
             content_ideas = []
@@ -555,8 +462,3 @@ with tab2:
 
 st.success("✨ Ready to generate professional social media graphics with AI-powered content!")
 
-# Initialize session state
-if 'headline' not in st.session_state:
-    st.session_state.headline = ""
-if 'description' not in st.session_state:
-    st.session_state.description = ""
