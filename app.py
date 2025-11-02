@@ -275,7 +275,49 @@ with metric_col2:
 with metric_col3:
     st.metric("Time Saved", "2,100+ hours")
 
-🎨 See What You'll Create
+# EXAMPLE GALLERY
+st.subheader("🎨 See What You'll Create")
+
+# Create sample graphics to show users
+try:
+    # Sample 1: Plumbing
+    sample_bg1 = load_background_image("Plumbing")
+    draw1 = ImageDraw.Draw(sample_bg1)
+    headline_font = load_font("Montserrat-Bold.ttf", 80)  # Increased from 60
+    phone_font = load_font("Montserrat-Bold.ttf", 50)     # Larger phone number
+    
+    draw1.text((540, 300), "24/7 Plumbing\nServices", fill=(255, 255, 255), 
+               font=headline_font, anchor="mm", align="center", stroke_width=3, stroke_fill=(0, 0, 0))
+    draw1.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), 
+               font=phone_font, anchor="mm", stroke_width=2, stroke_fill=(0, 0, 0))
+    
+    # Sample 2: Cleaning
+    sample_bg2 = load_background_image("Cleaning") 
+    draw2 = ImageDraw.Draw(sample_bg2)
+    draw2.text((540, 300), "Sparkling Clean\nResults", fill=(255, 255, 255), 
+               font=headline_font, anchor="mm", align="center", stroke_width=3, stroke_fill=(0, 0, 0))
+    draw2.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), 
+               font=phone_font, anchor="mm", stroke_width=2, stroke_fill=(0, 0, 0))
+    
+    # Sample 3: HVAC
+    sample_bg3 = load_background_image("HVAC")
+    draw3 = ImageDraw.Draw(sample_bg3)
+    draw3.text((540, 300), "HVAC Experts\n24/7 Service", fill=(255, 255, 255), 
+               font=headline_font, anchor="mm", align="center", stroke_width=3, stroke_fill=(0, 0, 0))
+    draw3.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), 
+               font=phone_font, anchor="mm", stroke_width=2, stroke_fill=(0, 0, 0))
+    
+    # Display the sample graphics
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.image(sample_bg1, caption="Professional Plumbing Post", use_column_width=True)
+    with col2:
+        st.image(sample_bg2, caption="Cleaning Service Post", use_column_width=True)
+    with col3:
+        st.image(sample_bg3, caption="HVAC Service Post", use_column_width=True)
+        
+except Exception as e:
+    st.error(f"Could not create sample graphics: {e}")
     
     # Display the sample graphics
     col1, col2, col3 = st.columns(3)
