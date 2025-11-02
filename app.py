@@ -13,6 +13,41 @@ st.set_page_config(
     layout="wide"
 )
 
+# HERO SECTION - Add at the top after imports
+st.markdown("""
+<div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">🚀 Create Social Media Graphics That Get Customers</h1>
+    <h3 style="font-size: 1.5rem; margin-bottom: 2rem;">Used by 250+ Local Service Businesses</h3>
+    <p style="font-size: 1.2rem;">Stop wasting time on design. Generate professional posts in 60 seconds.</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# EXAMPLE GALLERY - Add before the form
+st.subheader("🎨 See What You'll Create")
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.image("https://via.placeholder.com/300x300/007bff/ffffff?text=Plumbing+Post", caption="Plumbing Service Post")
+with col2:
+    st.image("https://via.placeholder.com/300x300/28a745/ffffff?text=Cleaning+Post", caption="Cleaning Service Post") 
+with col3:
+    st.image("https://via.placeholder.com/300x300/dc3545/ffffff?text=HVAC+Post", caption="HVAC Service Post")
+    
+# TESTIMONIALS
+st.subheader("💬 What Business Owners Say")
+testimonial_col1, testimonial_col2 = st.columns(2)
+with testimonial_col1:
+    st.info("""
+    **"This tool saved me 5 hours per week! My social media engagement doubled in 30 days."**
+    - Mike R., Plumbing Business Owner
+    """)
+with testimonial_col2:
+    st.success("""
+    **"Finally, professional graphics without hiring a designer. Worth every penny!"**
+    - Sarah L., Cleaning Service
+    """)
+    
 # Load fonts
 def load_font(font_name, size):
     font_path = os.path.join("fonts", font_name)
