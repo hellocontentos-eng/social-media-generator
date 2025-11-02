@@ -21,12 +21,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("---")
+
 # ---------------- Metrics ----------------
 metric_col1, metric_col2, metric_col3 = st.columns(3)
 metric_col1.metric("Graphics Created", "1,234+")
 metric_col2.metric("Businesses Helped", "250+")
 metric_col3.metric("Time Saved", "2,100+ hours")
-
 
 st.markdown("---")
 
@@ -43,8 +44,8 @@ with st.sidebar:
         st.info("Contact: hello.contentos@gmail.com")
     
     st.header("💡 Need Help?")
-    st.write("Email: hello.contentos@gmail.com", key="sidebar_help_email")
-    st.write("24-48 hour response time", key="sidebar_help_response")
+    st.write("Email: hello.contentos@gmail.com")
+    st.write("24-48 hour response time")
 
 # ---------------- Helper Functions ----------------
 def load_font(font_name, size):
@@ -95,71 +96,66 @@ tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
 
 # ---------------- Tab 1 ----------------
 with tab1:
-    tab1_container = st.container()
-    with tab1_container:
-        col1, col2 = st.columns([2,1])
-        with col1:
-            # --- Business & Template Selection ---
-            business_type = st.selectbox(
-                "Business Type:", 
-                ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"], 
-                key="tab1_business_type"
-            )
-            template_type = st.selectbox(
-                "Design Template:", 
-                ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], 
-                key="tab1_template_type"
-            )
+    col1, col2 = st.columns([2,1])
+    with col1:
+        # Business & Template
+        business_type = st.selectbox(
+            "Business Type:", 
+            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"], 
+            key="tab1_business_type"
+        )
+        template_type = st.selectbox(
+            "Design Template:", 
+            ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], 
+            key="tab1_template_type"
+        )
 
-            # --- Session-state safe defaults ---
-            if "tab1_phone" not in st.session_state:
-                st.session_state.tab1_phone = "(555) 123-4567"
-            if "tab1_headline" not in st.session_state:
-                st.session_state.tab1_headline = f"Professional {business_type} Services"
-            if "tab1_description" not in st.session_state:
-                st.session_state.tab1_description = f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."
+        # Session-state safe defaults
+        if "tab1_phone" not in st.session_state:
+            st.session_state.tab1_phone = "(555) 123-4567"
+        if "tab1_headline" not in st.session_state:
+            st.session_state.tab1_headline = f"Professional {business_type} Services"
+        if "tab1_description" not in st.session_state:
+            st.session_state.tab1_description = f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."
 
-            # --- Text Inputs ---
-            phone_number = st.text_input("Phone Number", value=st.session_state.tab1_phone, key="tab1_phone_input")
-            st.session_state.tab1_phone = phone_number
+        # Text Inputs
+        phone_number = st.text_input("Phone Number", value=st.session_state.tab1_phone, key="tab1_phone_input")
+        st.session_state.tab1_phone = phone_number
 
-            headline = st.text_input("Headline", value=st.session_state.tab1_headline, key="tab1_headline_input")
-            st.session_state.tab1_headline = headline
+        headline = st.text_input("Headline", value=st.session_state.tab1_headline, key="tab1_headline_input")
+        st.session_state.tab1_headline = headline
 
-            description = st.text_area("Description", value=st.session_state.tab1_description, key="tab1_description_input")
-            st.session_state.tab1_description = description
+        description = st.text_area("Description", value=st.session_state.tab1_description, key="tab1_description_input")
+        st.session_state.tab1_description = description
 
-            # --- AI Suggest ---
-            if st.button("💡 Suggest AI Text", key="tab1_ai_suggest"):
-                ai_result = generate_ai_copy(business_type)
-                st.session_state.tab1_headline = ai_result["headline"]
-                st.session_state.tab1_description = ai_result["description"] + "\n" + " ".join(ai_result["hashtags"])
-                st.success("✅ AI suggestion generated!")
-                st.write("**Headline:**", st.session_state.tab1_headline)
-                st.write("**Description + Hashtags:**", st.session_state.tab1_description)
+        # AI Suggest
+        if st.button("💡 Suggest AI Text", key="tab1_ai_suggest"):
+            ai_result = generate_ai_copy(business_type)
+            st.session_state.tab1_headline = ai_result["headline"]
+            st.session_state.tab1_description = ai_result["description"] + "\n" + " ".join(ai_result["hashtags"])
+            st.success("✅ AI suggestion generated!")
+            st.write("**Headline:**", st.session_state.tab1_headline)
+            st.write("**Description + Hashtags:**", st.session_state.tab1_description)
 
-            # --- Generate Graphic ---
-            if "generate_clicked" not in st.session_state:
-                st.session_state.generate_clicked = False
+        # Generate Graphic
+        if "generate_clicked" not in st.session_state:
+            st.session_state.generate_clicked = False
 
-            generate_placeholder = st.empty()
-            with generate_placeholder:
-                if st.button("Generate Graphic", type="primary", key="tab1_generate_graphic"):
-                    st.session_state.generate_clicked = True
+        if st.button("Generate Graphic", type="primary", key="tab1_generate_graphic"):
+            st.session_state.generate_clicked = True
 
-        # --- Tips Column ---
-        with col2:
-            st.header("💡 Tips")
-            tips = {
-                "Plumbing": "• Show before/after photos\n• Highlight emergency services\n• Share water-saving tips",
-                "Cleaning": "• Post sparkling results\n• Eco-friendly products\n• Seasonal specials",
-                "Landscaping": "• Garden transformations\n• Lawn care tips\n• Seasonal planting",
-                "HVAC": "• Maintenance tips\n• Energy efficiency\n• Emergency repairs",
-                "Electrical": "• Safety tips\n• Smart home installs\n• Code compliance"
-            }
-            st.write(tips[business_type], key="tab1_tips")
+    with col2:
+        st.header("💡 Tips")
+        tips = {
+            "Plumbing": "• Show before/after photos\n• Highlight emergency services\n• Share water-saving tips",
+            "Cleaning": "• Post sparkling results\n• Eco-friendly products\n• Seasonal specials",
+            "Landscaping": "• Garden transformations\n• Lawn care tips\n• Seasonal planting",
+            "HVAC": "• Maintenance tips\n• Energy efficiency\n• Emergency repairs",
+            "Electrical": "• Safety tips\n• Smart home installs\n• Code compliance"
+        }
+        st.write(tips[business_type])
 
-    # Generate Graphic if clicked
+    # Render Graphic if clicked
     if st.session_state.generate_clicked:
         hashtags_list = [tag for tag in st.session_state.tab1_description.split() if tag.startswith("#")]
         image = create_social_media_graphic(template_type, business_type, st.session_state.tab1_headline, st.session_state.tab1_description, st.session_state.tab1_phone, hashtags_list)
@@ -183,7 +179,7 @@ with tab2:
         "Sunday: Industry news"
     ]
     for idx, idea in enumerate(content_ideas):
-        st.write(f"✅ {idea}", key=f"tab2_idea_{idx}")
-    st.download_button("📥 Download Content Calendar", data=json.dumps(content_ideas, indent=2), file_name="content_calendar.json", mime="application/json", key="tab2_download_calendar")
+        st.write(f"✅ {idea}")
+    st.download_button("📥 Download Content Calendar", data=json.dumps(content_ideas, indent=2), file_name="content_calendar.json", mime="application/json")
 
 st.success("✨ Ready to generate professional social media graphics!")
