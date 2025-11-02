@@ -50,40 +50,62 @@ BACKGROUND_LIBRARY = {
 
 # Smart content generation with Gemini
 def generate_ai_content(business_type, content_type="headline"):
-    """Generate smart marketing content using Gemini"""
+    """Generate smart marketing content with model discovery"""
     
     content_prompts = {
-        "headline": f"Create a compelling, attention-grabbing headline for a {business_type} business social media post. Make it engaging and professional. Return only the headline text.",
-        "description": f"Write a short, persuasive description for a {business_type} company social media post. Highlight key benefits and include a call-to-action. Keep it under 150 characters. Return only the description text.",
+        "headline": f"Create a compelling headline for a {business_type} business social media post",
+        "description": f"Write a short description for a {business_type} company social media post",
     }
     
-    # Try different model names in order
-    model_names = [
-        'gemini-pro',
-        'models/gemini-pro', 
-        'models/gemini-1.0-pro',
-        'gemini-1.0-pro'
-    ]
-    
-    for model_name in model_names:
-        try:
-            st.write(f"🔧 Trying model: {model_name}")
+    try:
+        # First, discover available models
+        available_models = []
+        for model in genai.list_models():
+            if 'generateContent' in model.supported_generation_methods:
+                available_models.append(model.name)
+        
+        st.write(f"🔍 Found {len(available_models)} available models")
+        
+        if available_models:
+            # Try the first available model
+            model_name = available_models[0]
+            st.write(f"🎯 Using model: {model_name}")
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(content_prompts[content_type])
-            result = response.text.strip().strip('"')
-            st.success(f"✅ Success with {model_name}!")
-            return result
-        except Exception as e:
-            st.write(f"❌ {model_name} failed: {e}")
-            continue
-    
-    # If all models fail, use fallback
-    st.error("❌ All Gemini models failed. Using fallback content.")
+            return response.text.strip()
+        else:
+            st.error("❌ No text generation models available")
+            return get_fallback_content(business_type, content_type)
+            
+    except Exception as e:
+        st.error(f"❌ API Error: {e}")
+        return get_fallback_content(business_type, content_type)
+
+def get_fallback_content(business_type, content_type):
+    """Enhanced fallback content"""
     fallback_content = {
-        "headline": f"Professional {business_type} Services",
-        "description": f"Expert {business_type} solutions for your home or business. Quality work guaranteed!",
+        "Plumbing": {
+            "headline": "🚰 Emergency Plumbing Services - 24/7 Available",
+            "description": "Fast, reliable plumbing solutions! Licensed & insured professionals."
+        },
+        "Cleaning": {
+            "headline": "✨ Sparkling Clean Results Guaranteed",
+            "description": "Professional cleaning services for homes & offices. Eco-friendly products!"
+        },
+        "HVAC": {
+            "headline": "❄️ HVAC Services & System Maintenance",
+            "description": "Stay comfortable year-round with expert heating & cooling services."
+        },
+        "Electrical": {
+            "headline": "⚡ Licensed Electrical Services & Repairs", 
+            "description": "Safe, reliable electrical solutions for homes and businesses."
+        },
+        "Landscaping": {
+            "headline": "🌿 Beautiful Landscaping & Lawn Care",
+            "description": "Transform your outdoor space with professional landscaping services."
+        }
     }
-    return fallback_content[content_type]
+    return fallback_content.get(business_type, {"headline": "Professional Services", "description": "Quality work guaranteed!"})[content_type]
 
 def load_background_image(business_type):
     """Load a random background image for the business type"""
