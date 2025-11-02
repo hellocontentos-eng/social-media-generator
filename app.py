@@ -49,41 +49,36 @@ BACKGROUND_LIBRARY = {
 }
 
 def generate_ai_content(business_type, content_type="headline"):
-    """Smart AI content generation that finds a working model"""
+    """Generate smart marketing content using FREE tier models only"""
     
     content_prompts = {
         "headline": f"Create a compelling headline for a {business_type} business social media post. Return only headline.",
         "description": f"Write a short description for a {business_type} company social media post. Return only description.",
     }
     
-    try:
-        # Get ALL available text generation models
-        available_models = []
-        for model in genai.list_models():
-            if 'generateContent' in model.supported_generation_methods:
-                available_models.append(model.name)
-        
-        st.write(f"🔍 Found {len(available_models)} text models")
-        
-        # Try each available model until one works
-        for model_name in available_models:
-            try:
-                st.write(f"🎯 Testing: {model_name}")
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(content_prompts[content_type])
-                result = response.text.strip().strip('"')
-                st.success(f"✅ Working model found: {model_name}")
-                return result
-            except Exception as e:
-                continue  # Try next model
-        
-        # No models worked
-        st.error("❌ No Gemini models worked")
-        return get_fallback_content(business_type, content_type)
-        
-    except Exception as e:
-        st.error(f"❌ Model discovery failed: {e}")
-        return get_fallback_content(business_type, content_type)
+    # ONLY USE FREE TIER MODELS (1.5 Flash models)
+    free_tier_models = [
+        "models/gemini-1.5-flash",           # Primary free tier model
+        "models/gemini-1.5-flash-001",       # Alternative 1.5 flash
+        "models/gemini-1.0-pro",             # Basic pro (often free)
+        "models/gemini-1.0-pro-001",         # Alternative pro
+    ]
+    
+    for model_name in free_tier_models:
+        try:
+            st.write(f"🎯 Trying FREE model: {model_name}")
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(content_prompts[content_type])
+            result = response.text.strip().strip('"')
+            st.success(f"✅ Using FREE model: {model_name}")
+            return result
+        except Exception as e:
+            st.write(f"❌ {model_name} not available")
+            continue
+    
+    # If no free models work, use enhanced fallback
+    st.error("❌ No free tier models available. Using fallback content.")
+    return get_fallback_content(business_type, content_type)
 
 def get_fallback_content(business_type, content_type):
     """Enhanced fallback content for when AI fails"""
