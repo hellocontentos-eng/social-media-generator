@@ -127,7 +127,7 @@ def load_font(font_name, size):
 
 # Enhanced Template Functions with AI backgrounds
 def create_template_modern(business_type, headline, description, phone_number, colors):
-    """Modern Professional Template with proper text spacing"""
+    """Modern Professional Template with dynamic text positioning"""
     try:
         # Load background image
         background = load_background_image(business_type)
@@ -138,36 +138,58 @@ def create_template_modern(business_type, headline, description, phone_number, c
         background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(background)
         
-        # 1. MAIN HEADLINE (Top Section)
+        # Calculate dynamic positions based on actual text height
+        current_y = 150  # Start position
+        
+        # 1. MAIN HEADLINE
         headline_font = load_font("Montserrat-Bold.ttf", 90)
         wrapped_headline = textwrap.fill(headline, width=12)
-        draw.text((540, 180), wrapped_headline, fill=colors["primary"], 
+        headline_bbox = draw.multiline_textbbox((540, current_y), wrapped_headline, font=headline_font, anchor="mm")
+        headline_height = headline_bbox[3] - headline_bbox[1]
+        
+        draw.text((540, current_y + headline_height//2), wrapped_headline, fill=colors["primary"], 
                   font=headline_font, anchor="mm", align="center", 
                   stroke_width=3, stroke_fill=(255, 255, 255))
         
-        # 2. BUSINESS TYPE (Below Headline - Proper Spacing)
+        # Move down for next element
+        current_y += headline_height + 30  # Add spacing
+        
+        # 2. BUSINESS TYPE
         badge_font = load_font("Montserrat-Medium.ttf", 38)
         badge_text = f"{business_type.upper()} SERVICES"
-        draw.text((540, 300), badge_text, fill=colors["accent"], 
+        badge_bbox = draw.textbbox((540, current_y), badge_text, font=badge_font, anchor="mm")
+        badge_height = badge_bbox[3] - badge_bbox[1]
+        
+        draw.text((540, current_y + badge_height//2), badge_text, fill=colors["accent"], 
                   font=badge_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
         
-        # 3. DESCRIPTION (Middle Section - Good Spacing)
+        # Move down for next element
+        current_y += badge_height + 40  # Add spacing
+        
+        # 3. DESCRIPTION
         desc_font = load_font("Montserrat-Regular.ttf", 42)
         wrapped_desc = textwrap.fill(description, width=24)
+        desc_bbox = draw.multiline_textbbox((540, current_y), wrapped_desc, font=desc_font, anchor="mm")
+        desc_height = desc_bbox[3] - desc_bbox[1]
         
         # Description background
-        desc_bbox = draw.multiline_textbbox((540, 450), wrapped_desc, font=desc_font, anchor="mm")
         padding = 20
         draw.rectangle([desc_bbox[0]-padding, desc_bbox[1]-padding, desc_bbox[2]+padding, desc_bbox[3]+padding], 
                        fill=(255, 255, 255, 230), outline=colors["primary"], width=2)
         
-        draw.multiline_text((540, 450), wrapped_desc, fill=(50, 50, 50), 
+        draw.multiline_text((540, current_y + desc_height//2), wrapped_desc, fill=(50, 50, 50), 
                            font=desc_font, anchor="mm", align="center")
         
-        # 4. CONTACT SECTION (Bottom Section - Ample Spacing)
+        # Move down for next element
+        current_y += desc_height + 60  # Add spacing
+        
+        # 4. CONTACT SECTION
         contact_font = load_font("Montserrat-SemiBold.ttf", 46)
         contact_text = f"Call Now: {phone_number}"
-        draw.text((540, 650), contact_text, fill=colors["primary"], 
+        contact_bbox = draw.textbbox((540, current_y), contact_text, font=contact_font, anchor="mm")
+        contact_height = contact_bbox[3] - contact_bbox[1]
+        
+        draw.text((540, current_y + contact_height//2), contact_text, fill=colors["primary"], 
                   font=contact_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
         
         return background
@@ -175,6 +197,7 @@ def create_template_modern(business_type, headline, description, phone_number, c
     except Exception as e:
         st.error(f"Error in modern template: {e}")
         return None
+        
 def create_template_minimal(business_type, headline, description, phone_number, colors):
     """Clean & Minimal Template with AI background"""
     try:
