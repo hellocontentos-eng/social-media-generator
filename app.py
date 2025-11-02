@@ -121,7 +121,7 @@ def load_font(font_name, size):
     except:
         return ImageFont.load_default()
 
-# Template 1: Modern Professional
+# Template 1: Modern Professional (Enhanced)
 def create_template_modern(business_type, headline, description, phone_number, colors):
     width, height = 1080, 1080
     image = Image.new('RGB', (width, height), color=(255, 255, 255))
@@ -129,115 +129,169 @@ def create_template_modern(business_type, headline, description, phone_number, c
     
     # Modern gradient background
     for i in range(height):
-        r = int(colors["primary"][0] * (1 - i/height) + 255 * (i/height))
-        g = int(colors["primary"][1] * (1 - i/height) + 255 * (i/height))
-        b = int(colors["primary"][2] * (1 - i/height) + 255 * (i/height))
+        r = int(colors["primary"][0] * (1 - i/height) + 230 * (i/height))
+        g = int(colors["primary"][1] * (1 - i/height) + 230 * (i/height))
+        b = int(colors["primary"][2] * (1 - i/height) + 230 * (i/height))
         draw.line([(0, i), (width, i)], fill=(r, g, b))
     
-    # Headline with shadow effect
-    headline_font = load_font("Montserrat-Bold.ttf", 68)
-    wrapped_headline = textwrap.fill(headline, width=18)
-    draw.text((width//2, 100), wrapped_headline, fill=(255, 255, 255), 
-              font=headline_font, anchor="mm")
+    # Decorative elements
+    draw.rectangle([0, 0, width, 120], fill=colors["primary"])
+    draw.rectangle([0, height-100, width, height], fill=colors["secondary"])
     
-    # Description box
-    desc_font = load_font("Montserrat-Regular.ttf", 32)
-    wrapped_desc = textwrap.fill(description, width=35)
+    # Headline with better styling
+    headline_font = load_font("Montserrat-Bold.ttf", 72)
+    wrapped_headline = textwrap.fill(headline, width=15)
+    draw.text((width//2, 60), wrapped_headline, fill=(255, 255, 255), 
+              font=headline_font, anchor="mm", stroke_width=2, stroke_fill=(100, 100, 100))
+    
+    # Business badge
+    badge_font = load_font("Montserrat-Medium.ttf", 36)
+    badge_text = f"{business_type.upper()} SERVICES"
+    badge_bbox = draw.textbbox((0, 0), badge_text, font=badge_font)
+    badge_width = badge_bbox[2] - badge_bbox[0] + 40
+    draw.rectangle([width//2 - badge_width//2, 180, width//2 + badge_width//2, 230], 
+                   fill=colors["accent"])
+    draw.text((width//2, 205), badge_text, fill=(255, 255, 255), font=badge_font, anchor="mm")
+    
+    # Description with background
+    desc_font = load_font("Montserrat-Regular.ttf", 36)
+    wrapped_desc = textwrap.fill(description, width=30)
+    
+    # Add semi-transparent background for description
+    desc_bbox = draw.multiline_textbbox((width//2, height//2), wrapped_desc, font=desc_font, anchor="mm")
+    padding = 30
+    draw.rectangle([desc_bbox[0]-padding, desc_bbox[1]-padding, desc_bbox[2]+padding, desc_bbox[3]+padding], 
+                   fill=(255, 255, 255, 200), outline=colors["primary"], width=3)
+    
     draw.multiline_text((width//2, height//2), wrapped_desc, fill=(50, 50, 50), 
                        font=desc_font, anchor="mm", align="center")
     
-    # Contact section
-    contact_font = load_font("Montserrat-SemiBold.ttf", 36)
-    draw.rectangle([0, height-120, width, height], fill=colors["secondary"])
-    draw.text((width//2, height-60), f"Call Today: {phone_number}", fill=(255, 255, 255), 
+    # Contact section with icon
+    contact_font = load_font("Montserrat-SemiBold.ttf", 40)
+    draw.text((width//2, height-50), f"📞 Call Today: {phone_number}", fill=(255, 255, 255), 
               font=contact_font, anchor="mm")
     
     return image
 
-# Template 2: Clean & Minimal
+# Template 2: Clean & Minimal (Enhanced)
 def create_template_minimal(business_type, headline, description, phone_number, colors):
     width, height = 1080, 1080
-    image = Image.new('RGB', (width, height), color=(250, 250, 250))
+    image = Image.new('RGB', (width, height), color=(248, 248, 248))
     draw = ImageDraw.Draw(image)
     
-    # Top accent bar
-    draw.rectangle([0, 0, width, 80], fill=colors["primary"])
+    # Top accent bar with pattern
+    draw.rectangle([0, 0, width, 100], fill=colors["primary"])
     
-    # Business type badge
-    badge_font = load_font("Montserrat-Medium.ttf", 28)
-    badge_text = f"{business_type.upper()} SERVICES"
-    draw.text((width//2, 40), badge_text, fill=(255, 255, 255), font=badge_font, anchor="mm")
+    # Business type with icon
+    badge_font = load_font("Montserrat-Medium.ttf", 32)
+    icons = {"Plumbing": "🔧", "Cleaning": "✨", "Landscaping": "🌿", "HVAC": "❄️", "Electrical": "⚡"}
+    badge_text = f"{icons.get(business_type, '🏢')} {business_type.upper()} SERVICES"
+    draw.text((width//2, 50), badge_text, fill=(255, 255, 255), font=badge_font, anchor="mm")
     
-    # Headline
-    headline_font = load_font("Montserrat-Bold.ttf", 64)
-    wrapped_headline = textwrap.fill(headline, width=20)
-    draw.text((width//2, 300), wrapped_headline, fill=colors["primary"], 
+    # Headline with accent color
+    headline_font = load_font("Montserrat-Bold.ttf", 68)
+    wrapped_headline = textwrap.fill(headline, width=16)
+    draw.text((width//2, 280), wrapped_headline, fill=colors["primary"], 
               font=headline_font, anchor="mm", align="center")
     
-    # Description
-    desc_font = load_font("Montserrat-Light.ttf", 30)
-    wrapped_desc = textwrap.fill(description, width=40)
-    draw.multiline_text((width//2, 550), wrapped_desc, fill=(80, 80, 80), 
-                       font=desc_font, anchor="mm", align="center")
+    # Decorative separator
+    draw.line([(width//4, 380), (3*width//4, 380)], fill=colors["accent"], width=4)
     
-    # Phone number
-    phone_font = load_font("Montserrat-SemiBold.ttf", 32)
+    # Description in elegant layout
+    desc_font = load_font("Montserrat-Light.ttf", 32)
+    wrapped_desc = textwrap.fill(description, width=35)
+    draw.multiline_text((width//2, 550), wrapped_desc, fill=(80, 80, 80), 
+                       font=desc_font, anchor="mm", align="center", spacing=10)
+    
+    # Contact in circle design
+    phone_font = load_font("Montserrat-SemiBold.ttf", 36)
+    circle_center = (width//2, height-180)
+    circle_radius = 80
+    draw.ellipse([circle_center[0]-circle_radius, circle_center[1]-circle_radius,
+                  circle_center[0]+circle_radius, circle_center[1]+circle_radius], 
+                 fill=colors["accent"], outline=colors["primary"], width=3)
+    draw.text(circle_center, "📞", fill=(255, 255, 255), font=phone_font, anchor="mm")
+    
+    # Phone number below circle
     draw.text((width//2, height-70), phone_number, fill=colors["primary"], 
               font=phone_font, anchor="mm")
     
     return image
 
 # Template 3: Bold & Energetic
+# Template 3: Bold & Energetic (Enhanced)
 def create_template_bold(business_type, headline, description, phone_number, colors):
     width, height = 1080, 1080
     image = Image.new('RGB', (width, height), color=colors["primary"])
     draw = ImageDraw.Draw(image)
     
-    # Central white card
-    card_width, card_height = 900, 700
-    card_x, card_y = (width - card_width) // 2, (height - card_height) // 2
-    draw.rectangle([card_x, card_y, card_x+card_width, card_y+card_height], 
-                   fill=(255, 255, 255))
+    # Dynamic background pattern
+    for i in range(0, width, 60):
+        draw.line([(i, 0), (i, height)], fill=colors["secondary"], width=2, joint="curve")
+    for i in range(0, height, 60):
+        draw.line([(0, i), (width, i)], fill=colors["secondary"], width=2, joint="curve")
     
-    # Headline
-    headline_font = load_font("Montserrat-Bold.ttf", 60)
-    wrapped_headline = textwrap.fill(headline, width=18)
-    draw.multiline_text((width//2, card_y + 150), wrapped_headline, fill=colors["primary"], 
-                       font=headline_font, anchor="mm", align="center")
+    # Central white card with shadow effect
+    card_width, card_height = 850, 650
+    card_x, card_y = (width - card_width) // 2, (height - card_height) // 2
+    
+    # Shadow effect
+    shadow_offset = 15
+    draw.rectangle([card_x+shadow_offset, card_y+shadow_offset, 
+                    card_x+card_width+shadow_offset, card_y+card_height+shadow_offset], 
+                   fill=(50, 50, 50))
+    
+    # Main card
+    draw.rectangle([card_x, card_y, card_x+card_width, card_y+card_height], 
+                   fill=(255, 255, 255), outline=colors["accent"], width=8)
+    
+    # Business icon and title
+    icon_font = load_font("Montserrat-Bold.ttf", 48)
+    icons = {"Plumbing": "🔧", "Cleaning": "✨", "Landscaping": "🌿", "HVAC": "❄️", "Electrical": "⚡"}
+    icon_text = f"{icons.get(business_type, '🏢')} {business_type.upper()}"
+    draw.text((width//2, card_y + 80), icon_text, fill=colors["primary"], 
+              font=icon_font, anchor="mm")
+    
+    # Headline with impact
+    headline_font = load_font("Montserrat-ExtraBold.ttf", 64)
+    wrapped_headline = textwrap.fill(headline, width=16)
+    draw.multiline_text((width//2, card_y + 200), wrapped_headline, fill=colors["primary"], 
+                       font=headline_font, anchor="mm", align="center", stroke_width=2, stroke_fill=(200, 200, 200))
+    
+    # Separator line
+    draw.line([(card_x + 100, card_y + 280), (card_x + card_width - 100, card_y + 280)], 
+              fill=colors["accent"], width=5)
     
     # Description
-    desc_font = load_font("Montserrat-Regular.ttf", 28)
-    wrapped_desc = textwrap.fill(description, width=35)
-    draw.multiline_text((width//2, card_y + 350), wrapped_desc, fill=(70, 70, 70), 
-                       font=desc_font, anchor="mm", align="center")
+    desc_font = load_font("Montserrat-SemiBold.ttf", 30)
+    wrapped_desc = textwrap.fill(description, width=32)
+    draw.multiline_text((width//2, card_y + 380), wrapped_desc, fill=(70, 70, 70), 
+                       font=desc_font, anchor="mm", align="center", spacing=12)
     
     # Urgent action section
-    action_font = load_font("Montserrat-Bold.ttf", 36)
-    draw.rectangle([card_x, card_y + card_height - 80, card_x+card_width, card_y+card_height], 
+    action_font = load_font("Montserrat-Black.ttf", 38)
+    draw.rectangle([card_x, card_y + card_height - 100, card_x+card_width, card_y+card_height], 
                    fill=colors["accent"])
-    draw.text((width//2, card_y + card_height - 40), f"CALL NOW: {phone_number}", 
+    
+    # Call-to-action text
+    draw.text((width//2, card_y + card_height - 60), f"📞 CALL NOW FOR FREE ESTIMATE", 
               fill=(255, 255, 255), font=action_font, anchor="mm")
+    
+    # Phone number emphasized
+    phone_font = load_font("Montserrat-Bold.ttf", 42)
+    draw.text((width//2, card_y + card_height - 20), phone_number, 
+              fill=(255, 255, 255), font=phone_font, anchor="mm")
     
     return image
 
 def create_social_media_graphic(template_type, business_type, headline, description, phone_number):
     color_schemes = {
-        "Plumbing": {"primary": (0, 100, 200), "secondary": (0, 150, 255), "accent": (255, 100, 0)},
-        "Cleaning": {"primary": (0, 150, 100), "secondary": (100, 200, 150), "accent": (255, 200, 0)},
-        "Landscaping": {"primary": (0, 120, 0), "secondary": (100, 200, 100), "accent": (200, 150, 0)},
-        "HVAC": {"primary": (200, 0, 0), "secondary": (255, 100, 100), "accent": (0, 100, 200)},
-        "Electrical": {"primary": (150, 0, 200), "secondary": (200, 100, 255), "accent": (255, 200, 0)}
+        "Plumbing": {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)},
+        "Cleaning": {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)},
+        "Landscaping": {"primary": (40, 120, 45), "secondary": (100, 180, 105), "accent": (255, 167, 38)},
+        "HVAC": {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)},
+        "Electrical": {"primary": (110, 25, 140), "secondary": (160, 90, 180), "accent": (255, 214, 0)}
     }
-    
-    colors = color_schemes.get(business_type, color_schemes["Plumbing"])
-    
-    templates = {
-        "Modern Professional": create_template_modern,
-        "Clean & Minimal": create_template_minimal,
-        "Bold & Energetic": create_template_bold
-    }
-    
-    return templates[template_type](business_type, headline, description, phone_number, colors)
 # Sidebar
 with st.sidebar:
     st.header("💰 Pricing")
