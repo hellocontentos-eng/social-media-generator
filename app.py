@@ -59,10 +59,15 @@ def generate_ai_content(business_type, content_type="headline"):
     }
     
     try:
+        st.write(f"🔍 DEBUG: Calling Gemini API for {content_type}...")
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(content_prompts[content_type])
-        return response.text.strip().strip('"')
+        result = response.text.strip().strip('"')
+        st.write(f"🔍 DEBUG: Gemini raw response: '{response.text}'")
+        st.write(f"🔍 DEBUG: Processed result: '{result}'")
+        return result
     except Exception as e:
+        st.error(f"❌ Gemini API Error: {e}")
         # Fallback content if AI fails
         fallback_content = {
             "headline": f"Professional {business_type} Services",
@@ -351,19 +356,37 @@ with tab1:
         )
         
         # AI Content Generation Buttons
+                # AI Content Generation Buttons
         col_a, col_b = st.columns(2)
         with col_a:
             if st.button("🎯 AI Generate Headline", key="ai_headline"):
+                st.write("🔍 DEBUG: AI Headline button clicked!")
                 with st.spinner("Generating smart headline..."):
-                    ai_headline = generate_ai_content(business_type, "headline")
-                    st.session_state.headline = ai_headline
-                    
+                    try:
+                        ai_headline = generate_ai_content(business_type, "headline")
+                        st.write(f"🔍 DEBUG: AI returned headline: '{ai_headline}'")
+                        st.session_state.headline = ai_headline
+                        st.write(f"🔍 DEBUG: Session state set to: '{st.session_state.headline}'")
+                    except Exception as e:
+                        st.error(f"❌ AI Headline Error: {e}")
+                        
         with col_b:
             if st.button("📝 AI Generate Description", key="ai_desc"):
+                st.write("🔍 DEBUG: AI Description button clicked!")
                 with st.spinner("Generating compelling description..."):
-                    ai_description = generate_ai_content(business_type, "description")
-                    st.session_state.description = ai_description
-        
+                    try:
+                        ai_description = generate_ai_content(business_type, "description")
+                        st.write(f"🔍 DEBUG: AI returned description: '{ai_description}'")
+                        st.session_state.description = ai_description
+                        st.write(f"🔍 DEBUG: Session state set to: '{st.session_state.description}'")
+                    except Exception as e:
+                        st.error(f"❌ AI Description Error: {e}")
+
+        # Debug session state
+        st.write("🔍 DEBUG: Current session state:")
+        st.write(f"Headline in session: '{st.session_state.get('headline', 'NOT SET')}'")
+        st.write(f"Description in session: '{st.session_state.get('description', 'NOT SET')}'")
+
         phone_number = st.text_input("Phone Number", value="(555) 123-4567", key="phone_main")
         headline = st.text_input("Headline", 
                                 value=st.session_state.get('headline', f"Professional {business_type} Services"), 
