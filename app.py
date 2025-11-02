@@ -154,7 +154,7 @@ with st.sidebar:
     st.header("💳 Upgrade to Pro")
     if st.button("Start $29/month Pro Plan"):
         st.success("Redirecting to secure checkout...")
-        st.info("Payment processing coming soon! For now, contact us at hello@yourbusiness.com")
+        st.info("Payment processing coming soon! For now, contact us at hello.contentos@gmail.com")
     
     # Your existing sidebar content continues below...
     st.header("📝 Customize Your Post")
