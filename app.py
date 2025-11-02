@@ -5,6 +5,7 @@ import textwrap
 import os
 import json
 import requests
+import io
 from datetime import datetime
 
 # ================= CONFIG ==================
@@ -69,7 +70,62 @@ def call_hf_sd(prompt: str):
     image = Image.open(response.raw).convert("RGB")
     return image
 
+def call_hf_sd_background(prompt: str, width=800, height=800):
+    """
+    Call Hugging Face SD API to generate background image only.
+    Returns a PIL.Image.
+    """
+    payload = {
+        "inputs": prompt,
+        "options": {"wait_for_model": True}
+    }
+    response = requests.post(HF_API_URL, headers=HEADERS, json=payload, stream=True)
+    if response.status_code != 200:
+        st.error(f"Hugging Face API error: {response.status_code}")
+        return None
+    return Image.open(response.raw).convert("RGB").resize((width, height))
+
+def overlay_text_on_image(image, business_type, headline, description, phone_number, colors):
+    """
+    Overlay headline, description, and phone number on the AI-generated background.
+    Adds semi-transparent rectangle behind text for readability.
+    """
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
+
+    # Rectangle overlay
+    overlay_height = 300
+    overlay = Image.new("RGBA", (width, overlay_height), (0, 0, 0, 120))  # semi-transparent
+    image.paste(overlay, (0, height - overlay_height), overlay)
+
+    # Fonts
+    headline_font = ImageFont.truetype("arial.ttf", 48)
+    desc_font = ImageFont.truetype("arial.ttf", 28)
+    phone_font = ImageFont.truetype("arial.ttf", 32)
+
+    # Headline
+    wrapped_headline = textwrap.fill(headline, width=25)
+    draw.multiline_text((width//2, height - overlay_height + 20), wrapped_headline,
+                        fill=(255,255,255), font=headline_font, anchor="mm", align="center")
+
+    # Description
+    wrapped_desc = textwrap.fill(description, width=35)
+    draw.multiline_text((width//2, height - overlay_height + 100), wrapped_desc,
+                        fill=(220,220,220), font=desc_font, anchor="mm", align="center")
+
+    # Phone number
+    draw.text((width//2, height - 50), f"📞 {phone_number}",
+              fill=colors["accent"], font=phone_font, anchor="mm")
+
+    return image
+
 def create_social_media_graphic(template_type, business_type, headline, description, phone_number, use_ai=False):
+    """
+    Main function to generate graphics.
+    If use_ai=True, generate AI background + overlay text.
+    Otherwise, use template-only graphic.
+    """
+    # Define colors
     colors = {
         "Plumbing": {"primary": (0,90,180), "accent": (255,140,0)},
         "Cleaning": {"primary": (30,110,40), "accent": (255,193,7)},
@@ -79,13 +135,18 @@ def create_social_media_graphic(template_type, business_type, headline, descript
     }.get(business_type, {"primary": (0,90,180), "accent": (255,140,0)})
 
     if use_ai:
-        prompt = f"A professional social media graphic for a {business_type} business: {headline}, {description}"
-        image = call_hf_sd(prompt)
-        if image is None:
+        # AI background prompt (no text)
+        prompt = f"A beautiful, professional background for a {business_type} business social media post, modern, clean, vibrant"
+        bg_image = call_hf_sd_background(prompt)
+        if bg_image is None:
+            st.warning("AI generation failed. Using template fallback.")
             return create_template_modern(business_type, headline, description, phone_number, colors)
-        return image
+        # Overlay text
+        return overlay_text_on_image(bg_image, business_type, headline, description, phone_number, colors)
     else:
+        # Template-only version
         return create_template_modern(business_type, headline, description, phone_number, colors)
+
 
 # ================= SIDEBAR ==================
 with st.sidebar:
