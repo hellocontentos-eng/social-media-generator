@@ -50,21 +50,41 @@ BACKGROUND_LIBRARY = {
 
 # Smart content generation with Gemini
 def generate_ai_content(business_type, content_type="headline"):
-    """Generate smart marketing content using Gemini 1.5 Flash"""
+    """Smart AI content generation that finds a working model"""
     
     content_prompts = {
-        "headline": f"Create a compelling, attention-grabbing headline for a {business_type} business social media post. Make it engaging and professional. Return only the headline text.",
-        "description": f"Write a short, persuasive description for a {business_type} company social media post. Highlight key benefits and include a call-to-action. Keep it under 150 characters. Return only the description text.",
+        "headline": f"Create a compelling headline for a {business_type} business social media post. Return only headline.",
+        "description": f"Write a short description for a {business_type} company social media post. Return only description.",
     }
     
-    # FORCE USE OF GEMINI 1.5 FLASH (cheaper & faster)
     try:
-        model = genai.GenerativeModel('models/gemini-1.5-flash')
-        response = model.generate_content(content_prompts[content_type])
-        result = response.text.strip().strip('"')
-        return result
+        # Get ALL available text generation models
+        available_models = []
+        for model in genai.list_models():
+            if 'generateContent' in model.supported_generation_methods:
+                available_models.append(model.name)
+        
+        st.write(f"🔍 Found {len(available_models)} text models")
+        
+        # Try each available model until one works
+        for model_name in available_models:
+            try:
+                st.write(f"🎯 Testing: {model_name}")
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(content_prompts[content_type])
+                result = response.text.strip().strip('"')
+                st.success(f"✅ Working model found: {model_name}")
+                return result
+            except Exception as e:
+                continue  # Try next model
+        
+        # No models worked
+        st.error("❌ No Gemini models worked")
+        return get_fallback_content(business_type, content_type)
+        
     except Exception as e:
-        st.error(f"❌ Gemini 1.5 Flash failed: {str(e)[:100]}...")
+        st.error(f"❌ Model discovery failed: {e}")
+        return get_fallback_content(business_type, content_type)ash failed: {str(e)[:100]}...")
         # Use enhanced fallback content
         return get_fallback_content(business_type, content_type)
 
