@@ -127,47 +127,49 @@ def load_font(font_name, size):
 
 # Enhanced Template Functions with AI backgrounds
 def create_template_modern(business_type, headline, description, phone_number, colors):
-    """Modern Professional Template with AI background"""
+    """Modern Professional Template with better layout"""
     try:
         # Load background image
         background = load_background_image(business_type)
         draw = ImageDraw.Draw(background)
         
-        # Lighter overlay for less dull effect (reduced from 180 to 120)
-        overlay = Image.new('RGBA', background.size, (255, 255, 255, 120))
+        # Lighter overlay
+        overlay = Image.new('RGBA', background.size, (255, 255, 255, 100))  # Even lighter
         background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(background)
         
-        # LARGER Headline (increased from 72 to 90)
-        headline_font = load_font("Montserrat-Bold.ttf", 90)
-        wrapped_headline = textwrap.fill(headline, width=12)  # Fewer words per line
-        draw.text((540, 250), wrapped_headline, fill=colors["primary"], 
+        # MAIN HEADLINE (Largest & Most Important)
+        headline_font = load_font("Montserrat-Bold.ttf", 100)  # Increased size
+        wrapped_headline = textwrap.fill(headline, width=12)
+        draw.text((540, 200), wrapped_headline, fill=colors["primary"], 
                   font=headline_font, anchor="mm", align="center", 
-                  stroke_width=2, stroke_fill=(255, 255, 255))
+                  stroke_width=3, stroke_fill=(255, 255, 255))
         
-        # LARGER Business badge (increased from 36 to 48)
-        badge_font = load_font("Montserrat-Medium.ttf", 48)
+        # BUSINESS TYPE (Smaller, as subtitle)
+        badge_font = load_font("Montserrat-Medium.ttf", 42)  # Smaller than headline
         badge_text = f"{business_type.upper()} SERVICES"
-        draw.text((540, 350), badge_text, fill=colors["accent"], 
-                  font=badge_font, anchor="mm", stroke_width=1, stroke_fill=(255, 255, 255))
+        draw.text((540, 320), badge_text, fill=colors["accent"], 
+                  font=badge_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
         
-        # LARGER Description (increased from 32 to 42)
-        desc_font = load_font("Montserrat-Regular.ttf", 42)
-        wrapped_desc = textwrap.fill(description, width=25)  # Fewer words per line
+        # DESCRIPTION (Clean & Readable)
+        desc_font = load_font("Montserrat-Regular.ttf", 48)  # Larger description
+        wrapped_desc = textwrap.fill(description, width=22)  # Better line breaks
         
-        # Better background for description
-        desc_bbox = draw.multiline_textbbox((540, 550), wrapped_desc, font=desc_font, anchor="mm")
-        padding = 25
+        # Description background for readability
+        desc_bbox = draw.multiline_textbbox((540, 480), wrapped_desc, font=desc_font, anchor="mm")
+        padding = 20
         draw.rectangle([desc_bbox[0]-padding, desc_bbox[1]-padding, desc_bbox[2]+padding, desc_bbox[3]+padding], 
-                       fill=(255, 255, 255, 220), outline=colors["primary"], width=3)
+                       fill=(255, 255, 255, 230), outline=colors["primary"], width=2)
         
-        draw.multiline_text((540, 550), wrapped_desc, fill=(50, 50, 50), 
+        draw.multiline_text((540, 480), wrapped_desc, fill=(50, 50, 50), 
                            font=desc_font, anchor="mm", align="center")
         
-        # LARGER Contact section (increased from 36 to 48)
-        contact_font = load_font("Montserrat-SemiBold.ttf", 48)
-        draw.text((540, 800), f"📞 {phone_number}", fill=colors["primary"], 
-                  font=contact_font, anchor="mm", stroke_width=1, stroke_fill=(255, 255, 255))
+        # CONTACT SECTION (Clear & Prominent)
+        contact_font = load_font("Montserrat-SemiBold.ttf", 52)
+        # Better phone formatting - use "Call Now" instead of icon
+        contact_text = f"Call Now: {phone_number}"
+        draw.text((540, 650), contact_text, fill=colors["primary"], 
+                  font=contact_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
         
         return background
         
@@ -305,29 +307,28 @@ with metric_col3:
 # EXAMPLE GALLERY
 st.subheader("🎨 See What You'll Create")
 
-# Create actual sample graphics using your template function
 try:
     sample1 = create_template_modern(
         "Plumbing",
-        "24/7 Emergency Plumbing", 
-        "Fast, reliable solutions for all your plumbing needs",
-        "(555) 123-PLUMB",
+        "Emergency Plumbing",  # Shorter, cleaner
+        "Fast solutions when you need them most",  # Better description
+        "(555) 123-4567",  # Normal phone format
         {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)}
     )
     
     sample2 = create_template_modern(
         "Cleaning", 
-        "Sparkling Clean Results",
-        "Professional cleaning services for homes and offices",
-        "(555) 123-CLEAN", 
+        "Sparkling Clean",  # Cleaner headline
+        "Professional results every time",  # Better description
+        "(555) 123-4567",  # Normal phone format
         {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)}
     )
     
     sample3 = create_template_modern(
         "HVAC",
-        "HVAC Experts On Call", 
-        "Heating and cooling solutions you can trust",
-        "(555) 123-HVAC",
+        "Climate Control",  # Better headline
+        "Comfort you can count on",  # Better description  
+        "(555) 123-4567",  # Normal phone format
         {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)}
     )
     
@@ -335,20 +336,12 @@ try:
     with col1:
         st.image(sample1, caption="Professional Plumbing Post", use_column_width=True)
     with col2:
-        st.image(sample2, caption="Cleaning Service Post", use_column_width=True) 
+        st.image(sample2, caption="Cleaning Service Post", use_column_width=True)
     with col3:
         st.image(sample3, caption="HVAC Service Post", use_column_width=True)
         
 except Exception as e:
     st.error(f"Could not create sample graphics: {e}")
-    # Simple fallback - just show the different backgrounds
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.image("backgrounds/plumbing_bg1.jpg", caption="Professional Plumbing Post")
-    with col2:
-        st.image("backgrounds/cleaning_bg1.jpg", caption="Cleaning Service Post")
-    with col3:
-        st.image("backgrounds/hvac_bg1.jpg", caption="HVAC Service Post")
 # TESTIMONIALS
 st.subheader("💬 What Business Owners Say")
 testimonial_col1, testimonial_col2 = st.columns(2)
