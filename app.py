@@ -150,8 +150,19 @@ with st.sidebar:
     st.write("**Pro ($29/month):** Unlimited + AI Content")
     st.write("**Business ($49/month):** White labeling")
     
-    if st.button("💳 Upgrade to Pro"):
-        st.info("Payment processing coming soon!")
+    # ADD THIS PAYMENT SECTION:
+    st.header("💳 Upgrade to Pro")
+    if st.button("Start $29/month Pro Plan"):
+        st.success("Redirecting to secure checkout...")
+        st.info("Payment processing coming soon! For now, contact us at hello@yourbusiness.com")
+    
+    # Your existing sidebar content continues below...
+    st.header("📝 Customize Your Post")
+    business_type = st.selectbox(
+        "Business Type:",
+        ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"]
+    )
+    # ... rest of your existing sidebar code
 
 # Main content
 tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
