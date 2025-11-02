@@ -1,185 +1,113 @@
 import streamlit as st
-import os
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
-import json
-from datetime import datetime
+import os
+import requests
+import hashlib
+from io import BytesIO
 
-# ---------------- App Config ----------------
-st.set_page_config(
-    page_title="Social Media Generator Pro",
-    page_icon="🎯",
-    layout="wide"
-)
+# ============ CONFIG ============
+HF_API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-1-5"
+HF_API_TOKEN = st.secrets["HF_API_TOKEN"]  # Add your Hugging Face token in Streamlit secrets
 
-# ---------------- Hero Section ----------------
-st.markdown("""
-<div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">🚀 Create Social Media Graphics That Get Customers</h1>
-    <h3 style="font-size: 1.5rem; margin-bottom: 2rem;">Used by 250+ Local Service Businesses</h3>
-    <p style="font-size: 1.2rem;">Stop wasting time on design. Generate professional posts in 60 seconds.</p>
-</div>
-""", unsafe_allow_html=True)
+CACHE_DIR = "hf_cache"
+os.makedirs(CACHE_DIR, exist_ok=True)
 
-st.markdown("---")
-
-# ---------------- Metrics ----------------
-metric_col1, metric_col2, metric_col3 = st.columns(3)
-metric_col1.metric("Graphics Created", "1,234+")
-metric_col2.metric("Businesses Helped", "250+")
-metric_col3.metric("Time Saved", "2,100+ hours")
-
-st.markdown("---")
-
-# ---------------- Sidebar ----------------
-with st.sidebar:
-    st.header("💰 Pricing")
-    st.write("**Free:** 10 graphics/month")
-    st.write("**Pro ($29/month):** Unlimited + AI Content")
-    st.write("**Business ($49/month):** White labeling")
-    
-    st.header("💳 Upgrade Now")
-    if st.button("Start $29/month Pro Plan", key="sidebar_pro_upgrade"):
-        st.success("Pro plan selected!")
-        st.info("Contact: hello.contentos@gmail.com")
-    
-    st.header("💡 Need Help?")
-    st.write("Email: hello.contentos@gmail.com")
-    st.write("24-48 hour response time")
-
-# ---------------- Helper Functions ----------------
-def load_font(font_name, size):
-    system_fonts = {
-        "Montserrat-Bold.ttf": "arialbd.ttf",
-        "Montserrat-Medium.ttf": "arial.ttf", 
-        "Montserrat-Regular.ttf": "arial.ttf",
-        "Montserrat-SemiBold.ttf": "arialbd.ttf",
-        "Montserrat-Light.ttf": "arial.ttf",
-        "Montserrat-ExtraBold.ttf": "arialbd.ttf"
-    }
-    system_font = system_fonts.get(font_name, "arial.ttf")
+# ====== UTILS ======
+def load_font(font_name="arial.ttf", size=32):
     try:
-        return ImageFont.truetype(system_font, size)
+        return ImageFont.truetype(font_name, size)
     except:
         return ImageFont.load_default()
 
-def create_social_media_graphic(template_type, business_type, headline, description, phone_number, hashtags_list=[]):
-    width, height = 800, 800
-    image = Image.new('RGB', (width, height), color=(255, 255, 255))
-    draw = ImageDraw.Draw(image)
+def hash_prompt(prompt):
+    return hashlib.md5(prompt.encode()).hexdigest()
+
+def generate_sd_image(prompt):
+    """
+    Generate image via Hugging Face Stable Diffusion API with caching
+    """
+    # Check cache first
+    prompt_hash = hash_prompt(prompt)
+    cache_path = os.path.join(CACHE_DIR, f"{prompt_hash}.png")
+    if os.path.exists(cache_path):
+        return Image.open(cache_path)
     
-    # Background
-    draw.rectangle([0,0,width,height], fill=(240,240,240))
+    headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+    payload = {"inputs": prompt}
+    
+    with st.spinner("Generating AI image..."):
+        response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=60)
+        if response.status_code == 200:
+            image = Image.open(BytesIO(response.content))
+            image.save(cache_path)
+            return image
+        else:
+            st.error(f"Error from Hugging Face API: {response.status_code}")
+            return None
+
+def overlay_text(image, business_type, headline, phone_number):
+    """
+    Overlay business info on AI-generated image
+    """
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
     
     # Headline
-    draw.text((width//2, 150), headline, fill=(0,0,0), font=load_font("Montserrat-Bold.ttf", 48), anchor="mm")
+    font_h = load_font(size=48)
+    draw.text((width//2, 50), headline, font=font_h, fill="white", anchor="ms")
     
-    # Description + hashtags
-    full_text = description + ("\n" + " ".join(hashtags_list) if hashtags_list else "")
-    draw.multiline_text((width//2, 300), full_text, fill=(50,50,50), font=load_font("Montserrat-Regular.ttf", 28), anchor="mm", align="center")
+    # Business type badge
+    font_b = load_font(size=36)
+    draw.text((width//2, 120), f"{business_type.upper()} SERVICES", font=font_b, fill="yellow", anchor="ms")
     
-    # Phone
-    draw.text((width//2, height-100), f"📞 {phone_number}", fill=(0,0,0), font=load_font("Montserrat-SemiBold.ttf", 32), anchor="mm")
+    # Phone number at bottom
+    font_p = load_font(size=32)
+    draw.text((width//2, height-60), f"📞 {phone_number}", font=font_p, fill="white", anchor="ms")
     
     return image
 
-# Dummy AI copy function
-def generate_ai_copy(business_type):
-    return {
-        "headline": f"Top {business_type} Services Near You!",
-        "description": f"Get the best {business_type} solutions with guaranteed quality.",
-        "hashtags": ["#LocalBusiness", f"#{business_type.replace(' ','')}", "#Professional"]
-    }
+# ======= STREAMLIT APP =======
+st.set_page_config(page_title="Social Media Generator Pro", layout="wide")
 
-# ---------------- Tabs ----------------
-tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
+st.title("🎯 Social Media Graphics Generator")
+st.subheader("Generate professional posts instantly!")
 
-# ---------------- Tab 1 ----------------
-with tab1:
-    col1, col2 = st.columns([2,1])
-    with col1:
-        # Business & Template
-        business_type = st.selectbox(
-            "Business Type:", 
-            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"], 
-            key="tab1_business_type"
-        )
-        template_type = st.selectbox(
-            "Design Template:", 
-            ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], 
-            key="tab1_template_type"
-        )
+# Sidebar
+st.sidebar.header("💰 Plans")
+st.sidebar.write("**Free:** 10 graphics/month")
+st.sidebar.write("**Pro:** Unlimited + AI Content")
+st.sidebar.write("Email: hello.contentos@gmail.com")
 
-        # Session-state safe defaults
-        if "tab1_phone" not in st.session_state:
-            st.session_state.tab1_phone = "(555) 123-4567"
-        if "tab1_headline" not in st.session_state:
-            st.session_state.tab1_headline = f"Professional {business_type} Services"
-        if "tab1_description" not in st.session_state:
-            st.session_state.tab1_description = f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."
+# Main content
+business_type = st.selectbox("Business Type:", ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"])
+phone_number = st.text_input("Phone Number", value="(555) 123-4567")
+headline = st.text_input("Headline", value=f"Professional {business_type} Services")
+description = st.text_area("Description", value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed!")
 
-        # Text Inputs
-        phone_number = st.text_input("Phone Number", value=st.session_state.tab1_phone, key="tab1_phone_input")
-        st.session_state.tab1_phone = phone_number
+generate_option = st.radio("Image Type:", ["Free Template", "AI Generated (Pro)"])
 
-        headline = st.text_input("Headline", value=st.session_state.tab1_headline, key="tab1_headline_input")
-        st.session_state.tab1_headline = headline
-
-        description = st.text_area("Description", value=st.session_state.tab1_description, key="tab1_description_input")
-        st.session_state.tab1_description = description
-
-        # AI Suggest
-        if st.button("💡 Suggest AI Text", key="tab1_ai_suggest"):
-            ai_result = generate_ai_copy(business_type)
-            st.session_state.tab1_headline = ai_result["headline"]
-            st.session_state.tab1_description = ai_result["description"] + "\n" + " ".join(ai_result["hashtags"])
-            st.success("✅ AI suggestion generated!")
-            st.write("**Headline:**", st.session_state.tab1_headline)
-            st.write("**Description + Hashtags:**", st.session_state.tab1_description)
-
-        # Generate Graphic
-        if "generate_clicked" not in st.session_state:
-            st.session_state.generate_clicked = False
-
-        if st.button("Generate Graphic", type="primary", key="tab1_generate_graphic"):
-            st.session_state.generate_clicked = True
-
-    with col2:
-        st.header("💡 Tips")
-        tips = {
-            "Plumbing": "• Show before/after photos\n• Highlight emergency services\n• Share water-saving tips",
-            "Cleaning": "• Post sparkling results\n• Eco-friendly products\n• Seasonal specials",
-            "Landscaping": "• Garden transformations\n• Lawn care tips\n• Seasonal planting",
-            "HVAC": "• Maintenance tips\n• Energy efficiency\n• Emergency repairs",
-            "Electrical": "• Safety tips\n• Smart home installs\n• Code compliance"
-        }
-        st.write(tips[business_type])
-
-    # Render Graphic if clicked
-    if st.session_state.generate_clicked:
-        hashtags_list = [tag for tag in st.session_state.tab1_description.split() if tag.startswith("#")]
-        image = create_social_media_graphic(template_type, business_type, st.session_state.tab1_headline, st.session_state.tab1_description, st.session_state.tab1_phone, hashtags_list)
-        os.makedirs("output", exist_ok=True)
-        image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
-        image.save(image_path)
-        st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
-        with open(image_path, "rb") as file:
-            st.download_button("📥 Download Graphic", file, file_name=f"{business_type}_social_media_post.png", mime="image/png", key="tab1_download_btn")
-
-# ---------------- Tab 2 ----------------
-with tab2:
-    st.header("30-Day Content Ideas")
-    content_ideas = [
-        "Monday: Service highlight of the week",
-        "Tuesday: Customer testimonial", 
-        "Wednesday: Educational tip",
-        "Thursday: Before/after transformation",
-        "Friday: Weekend special offer",
-        "Saturday: Team spotlight",
-        "Sunday: Industry news"
-    ]
-    for idx, idea in enumerate(content_ideas):
-        st.write(f"✅ {idea}")
-    st.download_button("📥 Download Content Calendar", data=json.dumps(content_ideas, indent=2), file_name="content_calendar.json", mime="application/json")
-
-st.success("✨ Ready to generate professional social media graphics!")
+if st.button("Generate Graphic", key="generate_graphic_btn"):
+    if generate_option == "Free Template":
+        # Use pre-generated placeholder template
+        width, height = 800, 800
+        image = Image.new("RGB", (width, height), color=(200, 200, 200))
+        draw = ImageDraw.Draw(image)
+        font_h = load_font(size=48)
+        draw.text((width//2, height//2), "FREE TEMPLATE", font=font_h, fill=(50,50,50), anchor="mm")
+    else:
+        # AI generated via Hugging Face SD API
+        prompt = f"{business_type} business social media post, professional, modern style"
+        image = generate_sd_image(prompt)
+        if image is None:
+            st.error("Failed to generate AI image.")
+            st.stop()
+    
+    # Overlay user text info
+    image = overlay_text(image, business_type, headline, phone_number)
+    
+    # Display and download
+    st.image(image, use_column_width=True)
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    st.download_button("📥 Download Graphic", data=buffered.getvalue(), file_name=f"{business_type}_post.png", mime="image/png")
