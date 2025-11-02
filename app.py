@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 import requests
 import time
 from io import BytesIO
+import plotly.graph_objects as go
+import plotly.io as pio
+import base64
 
 # App configuration
 st.set_page_config(
@@ -71,6 +74,25 @@ BACKGROUND_CACHE = {
     ]
 }
 
+def create_social_media_graphic(template_type, business_type, headline, description, phone_number):
+    """Main function to create social media graphics using Plotly"""
+    color_schemes = {
+        "Plumbing": {"primary": (0, 90, 180), "accent": (255, 140, 0)},
+        "Cleaning": {"primary": (30, 110, 40), "accent": (255, 193, 7)},
+        "Landscaping": {"primary": (40, 120, 45), "accent": (255, 167, 38)},
+        "HVAC": {"primary": (180, 30, 30), "accent": (66, 133, 244)},
+        "Electrical": {"primary": (110, 25, 140), "accent": (255, 214, 0)}
+    }
+    
+    colors = color_schemes.get(business_type, color_schemes["Plumbing"])
+    
+    # Create Plotly template (we'll handle different styles later)
+    fig = create_plotly_template(business_type, headline, description, phone_number, colors)
+    
+    if fig:
+        return fig_to_image(fig)
+    return None
+
 def create_fallback_background(business_type):
     """Create professional CSS-style background as fallback"""
     width, height = 1080, 1080
@@ -110,158 +132,6 @@ def load_background_image(business_type):
         # If local file fails, use fallback background
         return create_fallback_background(business_type)
         
-def load_font(font_name, size):
-    """Load fonts from your fonts folder"""
-    try:
-        font_path = f"fonts/{font_name}"
-        return ImageFont.truetype(font_path, size)
-    except Exception as e:
-        # If specific font fails, try to load any available font
-        try:
-            return ImageFont.truetype("fonts/Montserrat-Regular.ttf", size)
-        except:
-            try:
-                return ImageFont.truetype("arial.ttf", size)
-            except:
-                return ImageFont.load_default()
-
-# Enhanced Template Functions with AI backgrounds
-def create_template_modern(business_type, headline, description, phone_number, colors):
-    """Modern Professional Template with safe fixed positioning"""
-    try:
-        background = load_background_image(business_type)
-        draw = ImageDraw.Draw(background)
-        
-        # Light overlay
-        overlay = Image.new('RGBA', background.size, (255, 255, 255, 80))
-        background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
-        draw = ImageDraw.Draw(background)
-        
-        # SAFE FIXED POSITIONS (no overlapping)
-        # 1. HEADLINE - Top section
-        headline_font = load_font("Montserrat-Bold.ttf", 80)
-        wrapped_headline = textwrap.fill(headline, width=12)
-        draw.text((540, 150), wrapped_headline, fill=colors["primary"], 
-                  font=headline_font, anchor="mm", align="center", 
-                  stroke_width=3, stroke_fill=(255, 255, 255))
-        
-        # 2. BUSINESS TYPE - Below headline with good gap
-        badge_font = load_font("Montserrat-Medium.ttf", 36)
-        badge_text = f"{business_type.upper()} SERVICES"
-        draw.text((540, 280), badge_text, fill=colors["accent"], 
-                  font=badge_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
-        
-        # 3. DESCRIPTION - Middle section
-        desc_font = load_font("Montserrat-Regular.ttf", 38)
-        wrapped_desc = textwrap.fill(description, width=22)
-        
-        # Description background (positioned safely below business type)
-        desc_bbox = draw.multiline_textbbox((540, 400), wrapped_desc, font=desc_font, anchor="mm")
-        padding = 20
-        draw.rectangle([desc_bbox[0]-padding, desc_bbox[1]-padding, desc_bbox[2]+padding, desc_bbox[3]+padding], 
-                       fill=(255, 255, 255, 230), outline=colors["primary"], width=2)
-        
-        draw.multiline_text((540, 400), wrapped_desc, fill=(50, 50, 50), 
-                           font=desc_font, anchor="mm", align="center")
-        
-        # 4. CONTACT - Bottom section with large gap
-        contact_font = load_font("Montserrat-SemiBold.ttf", 42)
-        contact_text = f"Call Now: {phone_number}"
-        draw.text((540, 600), contact_text, fill=colors["primary"], 
-                  font=contact_font, anchor="mm", stroke_width=2, stroke_fill=(255, 255, 255))
-        
-        return background
-        
-    except Exception as e:
-        st.error(f"Error in modern template: {e}")
-        return None        
-def create_template_minimal(business_type, headline, description, phone_number, colors):
-    """Clean & Minimal Template with AI background"""
-    try:
-        background = load_background_image(business_type)
-        draw = ImageDraw.Draw(background)
-        
-        # Lighter overlay (reduced from 120 to 80)
-        overlay = Image.new('RGBA', background.size, (0, 0, 0, 80))
-        background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
-        draw = ImageDraw.Draw(background)
-        
-        # LARGER Headline (increased from 64 to 80)
-        headline_font = load_font("Montserrat-Bold.ttf", 80)
-        wrapped_headline = textwrap.fill(headline, width=14)
-        draw.text((540, 300), wrapped_headline, fill=(255, 255, 255), 
-                  font=headline_font, anchor="mm", align="center", 
-                  stroke_width=2, stroke_fill=(0, 0, 0))
-        
-        # Separator
-        draw.line([(340, 420), (740, 420)], fill=colors["accent"], width=6)
-        
-        # LARGER Description (increased from 28 to 36)
-        desc_font = load_font("Montserrat-Light.ttf", 36)
-        wrapped_desc = textwrap.fill(description, width=30)
-        draw.multiline_text((540, 550), wrapped_desc, fill=(255, 255, 255), 
-                           font=desc_font, anchor="mm", align="center", spacing=15,
-                           stroke_width=1, stroke_fill=(0, 0, 0))
-        
-        # LARGER Phone section
-        phone_font = load_font("Montserrat-SemiBold.ttf", 42)  # Increased from 32
-        circle_center = (540, 750)
-        circle_radius = 80  # Larger circle
-        draw.ellipse([circle_center[0]-circle_radius, circle_center[1]-circle_radius,
-                      circle_center[0]+circle_radius, circle_center[1]+circle_radius], 
-                     fill=colors["accent"])
-        draw.text(circle_center, "📞", fill=(255, 255, 255), font=phone_font, anchor="mm")
-        draw.text((540, 850), phone_number, fill=(255, 255, 255), 
-                  font=phone_font, anchor="mm", stroke_width=1, stroke_fill=(0, 0, 0))
-        
-        return background
-        
-    except Exception as e:
-        st.error(f"Error in minimal template: {e}")
-        return None
-
-def create_template_bold(business_type, headline, description, phone_number, colors):
-    """Bold & Energetic Template with AI background"""
-    try:
-        background = load_background_image(business_type)
-        draw = ImageDraw.Draw(background)
-        
-        # Central content card with shadow effect
-        card_width, card_height = 800, 500
-        card_x, card_y = 140, 290
-        
-        # Shadow
-        draw.rectangle([card_x+10, card_y+10, card_x+card_width+10, card_y+card_height+10], 
-                       fill=(50, 50, 50, 180))
-        
-        # Main card
-        draw.rectangle([card_x, card_y, card_x+card_width, card_y+card_height], 
-                       fill=(255, 255, 255), outline=colors["accent"], width=6)
-        
-        # Headline
-        headline_font = load_font("Montserrat-ExtraBold.ttf", 56)
-        wrapped_headline = textwrap.fill(headline, width=18)
-        draw.multiline_text((540, card_y + 100), wrapped_headline, fill=colors["primary"], 
-                           font=headline_font, anchor="mm", align="center")
-        
-        # Description
-        desc_font = load_font("Montserrat-SemiBold.ttf", 28)
-        wrapped_desc = textwrap.fill(description, width=32)
-        draw.multiline_text((540, card_y + 280), wrapped_desc, fill=(70, 70, 70), 
-                           font=desc_font, anchor="mm", align="center", spacing=8)
-        
-        # Urgent action bar
-        action_font = load_font("Montserrat-Black.ttf", 34)
-        draw.rectangle([card_x, card_y + card_height - 80, card_x+card_width, card_y+card_height], 
-                       fill=colors["accent"])
-        draw.text((540, card_y + card_height - 40), f"CALL NOW: {phone_number}", 
-                  fill=(255, 255, 255), font=action_font, anchor="mm")
-        
-        return background
-        
-    except Exception as e:
-        st.error(f"Error in bold template: {e}")
-        return None
 
 def create_social_media_graphic(template_type, business_type, headline, description, phone_number):
     """Main function to create social media graphics"""
@@ -306,40 +176,50 @@ with metric_col3:
 st.subheader("🎨 See What You'll Create")
 
 try:
-    sample1 = create_template_modern(
+    # Create sample graphics using Plotly
+    sample1_fig = create_plotly_template(
         "Plumbing",
-        "Emergency Plumbing",  # Shorter
-        "Fast & reliable service",  # Shorter
+        "Emergency Plumbing",
+        "Fast & reliable service",
         "(555) 123-4567",
-        {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)}
+        {"primary": (0, 90, 180), "accent": (255, 140, 0)}
     )
-
-    sample2 = create_template_modern(
+    
+    sample2_fig = create_plotly_template(
         "Cleaning", 
         "Sparkling Clean",
-        "Professional results",  # Shorter
+        "Professional results",
         "(555) 123-4567",
-        {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)}
+        {"primary": (30, 110, 40), "accent": (255, 193, 7)}
     )
-
-    sample3 = create_template_modern(
+    
+    sample3_fig = create_plotly_template(
         "HVAC",
-        "Climate Experts",  # Shorter
-        "Comfort you can trust",  # Shorter
+        "Climate Experts", 
+        "Comfort you can trust",
         "(555) 123-4567",
-        {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)}
+        {"primary": (180, 30, 30), "accent": (66, 133, 244)}
     )
+    
+    # Convert to images for display
+    sample1_img = fig_to_image(sample1_fig) if sample1_fig else None
+    sample2_img = fig_to_image(sample2_fig) if sample2_fig else None  
+    sample3_img = fig_to_image(sample3_fig) if sample3_fig else None
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image(sample1, caption="Professional Plumbing Post", use_column_width=True)
+        if sample1_img:
+            st.image(sample1_img, caption="Professional Plumbing Post", use_column_width=True)
     with col2:
-        st.image(sample2, caption="Cleaning Service Post", use_column_width=True)
+        if sample2_img:
+            st.image(sample2_img, caption="Cleaning Service Post", use_column_width=True)
     with col3:
-        st.image(sample3, caption="HVAC Service Post", use_column_width=True)
+        if sample3_img:
+            st.image(sample3_img, caption="HVAC Service Post", use_column_width=True)
         
 except Exception as e:
     st.error(f"Could not create sample graphics: {e}")
+    
 # TESTIMONIALS
 st.subheader("💬 What Business Owners Say")
 testimonial_col1, testimonial_col2 = st.columns(2)
