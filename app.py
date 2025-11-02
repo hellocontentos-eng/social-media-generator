@@ -19,39 +19,19 @@ st.set_page_config(
 # Simple local background system (FREE & RELIABLE)
 BACKGROUND_CACHE = {
     "Plumbing": [
-        "backgrounds/plumbing_bg1.jpg",
-        "backgrounds/plumbing_bg2.jpg", 
-        "backgrounds/plumbing_bg3.jpg",
-        "backgrounds/plumbing_bg4.jpg",
-        "backgrounds/plumbing_bg5.jpg"
+        "backgrounds/plumbing_bg1.jpg"  # Only use the image you actually have
     ],
     "Cleaning": [
-        "backgrounds/cleaning_bg1.jpg",
-        "backgrounds/cleaning_bg2.jpg",
-        "backgrounds/cleaning_bg3.jpg", 
-        "backgrounds/cleaning_bg4.jpg",
-        "backgrounds/cleaning_bg5.jpg"
+        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
     ],
     "HVAC": [
-        "backgrounds/hvac_bg1.jpg",
-        "backgrounds/hvac_bg2.jpg",
-        "backgrounds/hvac_bg3.jpg",
-        "backgrounds/hvac_bg4.jpg",
-        "backgrounds/hvac_bg5.jpg"
+        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
     ],
     "Electrical": [
-        "backgrounds/electrical_bg1.jpg",
-        "backgrounds/electrical_bg2.jpg",
-        "backgrounds/electrical_bg3.jpg",
-        "backgrounds/electrical_bg4.jpg",
-        "backgrounds/electrical_bg5.jpg"
+        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
     ],
     "Landscaping": [
-        "backgrounds/landscaping_bg1.jpg",
-        "backgrounds/landscaping_bg2.jpg",
-        "backgrounds/landscaping_bg3.jpg",
-        "backgrounds/landscaping_bg4.jpg",
-        "backgrounds/landscaping_bg5.jpg"
+        "backgrounds/plumbing_bg1.jpg"  # Use same image for now
     ]
 }
 
@@ -86,11 +66,8 @@ def load_background_image(business_type):
     background_path = random.choice(backgrounds)
     
     # DEBUG: Show what path is being used
-    st.write(f"🔍 Trying to load: {background_path}")
-    
     try:
         image = Image.open(background_path)
-        st.write(f"✅ Successfully loaded: {background_path}")
         return image.resize((1080, 1080))
     except Exception as e:
         st.error(f"❌ Failed to load {background_path}: {e}")
@@ -295,13 +272,47 @@ with metric_col3:
 
 # EXAMPLE GALLERY
 st.subheader("🎨 See What You'll Create")
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.image("backgrounds/plumbing_bg1.jpg", caption="Professional Plumbing Post")
-with col2:
-    st.image("backgrounds/plumbing_bg1.jpg", caption="Cleaning Service Post")
-with col3:
-    st.image("backgrounds/plumbing_bg1.jpg", caption="HVAC Service Post")
+
+# Create sample graphics to show users
+try:
+    # Sample 1: Plumbing
+    sample_bg1 = load_background_image("Plumbing")
+    draw1 = ImageDraw.Draw(sample_bg1)
+    headline_font = load_font("Montserrat-Bold.ttf", 60)
+    draw1.text((540, 300), "24/7 Plumbing\nServices", fill=(255, 255, 255), font=headline_font, anchor="mm", align="center")
+    draw1.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), font=headline_font, anchor="mm")
+    
+    # Sample 2: Cleaning
+    sample_bg2 = load_background_image("Cleaning") 
+    draw2 = ImageDraw.Draw(sample_bg2)
+    draw2.text((540, 300), "Sparkling Clean\nResults", fill=(255, 255, 255), font=headline_font, anchor="mm", align="center")
+    draw2.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), font=headline_font, anchor="mm")
+    
+    # Sample 3: HVAC
+    sample_bg3 = load_background_image("HVAC")
+    draw3 = ImageDraw.Draw(sample_bg3)
+    draw3.text((540, 300), "HVAC Experts\n24/7 Service", fill=(255, 255, 255), font=headline_font, anchor="mm", align="center")
+    draw3.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), font=headline_font, anchor="mm")
+    
+    # Display the sample graphics
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.image(sample_bg1, caption="Professional Plumbing Post", use_column_width=True)
+    with col2:
+        st.image(sample_bg2, caption="Cleaning Service Post", use_column_width=True)
+    with col3:
+        st.image(sample_bg3, caption="HVAC Service Post", use_column_width=True)
+        
+except Exception as e:
+    st.error(f"Could not create sample graphics: {e}")
+    # Fallback: just show plain backgrounds
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.image("backgrounds/plumbing_bg1.jpg", caption="Professional Plumbing Post")
+    with col2:
+        st.image("backgrounds/plumbing_bg1.jpg", caption="Cleaning Service Post")
+    with col3:
+        st.image("backgrounds/plumbing_bg1.jpg", caption="HVAC Service Post")
 
 st.markdown("---")
 st.subheader("🚀 How It Works - 3 Simple Steps")
