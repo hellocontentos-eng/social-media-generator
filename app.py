@@ -35,7 +35,9 @@ with tab1:
     with col1:
         business_type = st.selectbox(
             "Business Type:",
-            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"]
+            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
+            key="business_type_main"
+        )            
         )
         
         # ... REST OF YOUR EXISTING GENERATOR CODE ...
@@ -248,10 +250,6 @@ def create_social_media_graphic(template_type, business_type, headline, descript
     
     return templates[template_type](business_type, headline, description, phone_number, colors)
 
-# Main app
-st.title("🚀 Social Media Generator Pro")
-st.subheader("Create professional posts for local service businesses")
-
 # Sidebar
 with st.sidebar:
     st.header("💰 Pricing")
@@ -270,6 +268,7 @@ with st.sidebar:
     business_type = st.selectbox(
         "Business Type:",
         ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"]
+        key="business_type_sidebar"  # ← ADD THIS
     )
     # ... rest of your existing sidebar code
 
@@ -287,7 +286,8 @@ with tab1:
         
         template_type = st.selectbox(
             "Design Template:",
-            ["Modern Professional", "Clean & Minimal", "Bold & Energetic"]
+            ["Modern Professional", "Clean & Minimal", "Bold & Energetic"],
+            key="template_type_main"  # ← ADD THIS
         )
         
         phone_number = st.text_input("Phone Number", value="(555) 123-4567")
