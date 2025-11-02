@@ -8,9 +8,6 @@ from datetime import datetime, timedelta
 import requests
 from io import BytesIO
 
-# Configure Gemini AI
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-
 # App configuration
 st.set_page_config(
     page_title="Social Media Generator Pro",
