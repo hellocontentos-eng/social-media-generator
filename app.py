@@ -4,24 +4,42 @@ from PIL import Image, ImageDraw, ImageFont
 import textwrap
 import random
 import json
-import google.generativeai as genai
 from datetime import datetime
 
-# --------------------------------------------------
-# CONFIG
-# --------------------------------------------------
+# ==== AI Text Integration ====
+import openai
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+def generate_ai_copy(business_type, tone="Professional"):
+    prompt = f"""
+    You are a social media copywriting expert.
+    Write a catchy headline and 2-line post description for a {business_type} business.
+    Tone: {tone}.
+    Include 3 relevant hashtags.
+    Respond ONLY in JSON format:
+    {{ "headline": "...", "description": "...", "hashtags": ["#","#","#"] }}
+    """
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+        content = response.choices[0].message.content
+        return json.loads(content)
+    except Exception as e:
+        st.error(f"AI text generation failed: {e}")
+        return {"headline": "", "description": "", "hashtags": []}
+
+
+# ==== Streamlit Config ====
 st.set_page_config(
     page_title="Social Media Generator Pro",
     page_icon="🎯",
     layout="wide"
 )
 
-# Configure Gemini (key stored safely in Streamlit secrets)
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-
-# --------------------------------------------------
-# HERO SECTION
-# --------------------------------------------------
+# ==== Hero Section ====
 st.markdown("""
 <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
     <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">🚀 Create Social Media Graphics That Get Customers</h1>
@@ -32,26 +50,21 @@ st.markdown("""
 
 st.markdown("---")
 
+# ==== Metrics ====
 metric_col1, metric_col2, metric_col3 = st.columns(3)
-with metric_col1:
-    st.metric("Graphics Created", "1,234+")
-with metric_col2:
-    st.metric("Businesses Helped", "250+")
-with metric_col3:
-    st.metric("Time Saved", "2,100+ hours")
+with metric_col1: st.metric("Graphics Created", "1,234+")
+with metric_col2: st.metric("Businesses Helped", "250+")
+with metric_col3: st.metric("Time Saved", "2,100+ hours")
 
+# ==== Example Gallery ====
 st.subheader("🎨 See What You'll Create")
 col1, col2, col3 = st.columns(3)
-with col1:
-    st.image("https://picsum.photos/300/300?random=1", caption="Professional Plumbing Post")
-with col2:
-    st.image("https://picsum.photos/300/300?random=2", caption="Cleaning Service Post") 
-with col3:
-    st.image("https://picsum.photos/300/300?random=3", caption="HVAC Service Post")
+with col1: st.image("https://picsum.photos/300/300?random=1", caption="Professional Plumbing Post")
+with col2: st.image("https://picsum.photos/300/300?random=2", caption="Cleaning Service Post")
+with col3: st.image("https://picsum.photos/300/300?random=3", caption="HVAC Service Post")
 
 st.markdown("---")
 st.subheader("🚀 How It Works - 3 Simple Steps")
-
 steps_col1, steps_col2, steps_col3 = st.columns(3)
 with steps_col1:
     st.markdown("### 1. 📝 Enter Your Details")
@@ -63,274 +76,150 @@ with steps_col3:
     st.markdown("### 3. 📥 Download & Post")
     st.write("Ready-to-use social media graphic")
 
-# --------------------------------------------------
-# TESTIMONIALS
-# --------------------------------------------------
+# ==== Testimonials ====
 st.subheader("💬 What Business Owners Say")
 testimonial_col1, testimonial_col2 = st.columns(2)
 with testimonial_col1:
-    st.info("""
-    **"This tool saved me 5 hours per week! My social media engagement doubled in 30 days."**
-    - Mike R., Plumbing Business Owner
-    """)
+    st.info("**\"This tool saved me 5 hours per week! My social media engagement doubled in 30 days.\"** - Mike R., Plumbing Business Owner")
 with testimonial_col2:
-    st.success("""
-    **"Finally, professional graphics without hiring a designer. Worth every penny!"**
-    - Sarah L., Cleaning Service
-    """)
+    st.success("**\"Finally, professional graphics without hiring a designer. Worth every penny!\"** - Sarah L., Cleaning Service")
 
 st.markdown("---")
-st.subheader("💰 Choose Your Plan")
 
+# ==== Pricing ====
+st.subheader("💰 Choose Your Plan")
 pricing_col1, pricing_col2, pricing_col3 = st.columns(3)
 with pricing_col1:
-    st.markdown("### 🆓 Starter")
-    st.write("**$0/month**")
-    st.write("• 10 graphics/month")
-    st.write("• Basic templates")
-    st.write("• Standard support")
-    
+    st.markdown("### 🆓 Starter\n**$0/month**\n• 10 graphics/month\n• Basic templates\n• Standard support")
 with pricing_col2:
-    st.markdown("### ⭐ Pro")
-    st.write("**$29/month**")
-    st.write("• Unlimited graphics")
-    st.write("• All templates + AI")
-    st.write("• Priority support")
-    
+    st.markdown("### ⭐ Pro\n**$29/month**\n• Unlimited graphics\n• All templates + AI\n• Priority support")
 with pricing_col3:
-    st.markdown("### 🏢 Business")
-    st.write("**$49/month**")
-    st.write("• White labeling")
-    st.write("• Custom templates")
-    st.write("• Dedicated support")
+    st.markdown("### 🏢 Business\n**$49/month**\n• White labeling\n• Custom templates\n• Dedicated support")
 
 st.markdown("---")
-st.subheader("❓ Frequently Asked Questions")
 
+# ==== FAQs ====
+st.subheader("❓ Frequently Asked Questions")
 with st.expander("How many graphics can I create?"):
     st.write("Free plan: 10/month | Pro/Business: Unlimited")
-    
 with st.expander("What social media platforms are supported?"):
-    st.write("All major platforms: Instagram, Facebook, LinkedIn, Twitter")
-    
+    st.write("All platforms: Instagram, Facebook, LinkedIn, Twitter")
 with st.expander("Can I use my own branding?"):
     st.write("Yes! Business plan includes custom colors and logos")
 
-# --------------------------------------------------
-# GEMINI FUNCTION
-# --------------------------------------------------
-def generate_gemini_copy(business_type, tone="Professional"):
-    """Generate social media copy for a business using Gemini."""
-    prompt = f"""
-    You are a social media copywriting expert.
-    Write a catchy headline and a 2-line post description for a {business_type} business.
-    The tone should be {tone.lower()} and relevant to local service marketing.
-    Include 3 relevant hashtags.
-
-    Respond ONLY in JSON:
-    {{
-      "headline": "string",
-      "description": "string",
-      "hashtags": ["#", "#", "#"]
-    }}
-    """
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        text = response.text.strip()
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        json_text = text[start:end]
-        return json.loads(json_text)
-    except Exception as e:
-        st.error(f"Gemini Error: {e}")
-        return None
-
-# --------------------------------------------------
-# TEMPLATE FUNCTIONS
-# --------------------------------------------------
+# ==== Font Loader & Template Functions ====
 def load_font(font_name, size):
-    system_fonts = {
-        "Montserrat-Bold.ttf": "arialbd.ttf",
-        "Montserrat-Medium.ttf": "arial.ttf", 
-        "Montserrat-Regular.ttf": "arial.ttf",
-        "Montserrat-SemiBold.ttf": "arialbd.ttf",
-        "Montserrat-Light.ttf": "arial.ttf",
-        "Montserrat-ExtraBold.ttf": "arialbd.ttf"
-    }
-    system_font = system_fonts.get(font_name, "arial.ttf")
     try:
-        return ImageFont.truetype(system_font, size)
+        return ImageFont.truetype(font_name, size)
     except:
         return ImageFont.load_default()
 
-def create_template_modern(business_type, headline, description, phone_number, colors):
+# Simple Modern Template Example
+def create_template_modern(business_type, headline, description, phone_number, colors, hashtags=None):
+    """Modern Professional Template with optional hashtags"""
     try:
         width, height = 800, 800
         image = Image.new('RGB', (width, height), color=(255, 255, 255))
         draw = ImageDraw.Draw(image)
-
+        
+        # Simple gradient background
         for i in range(height):
             r = int(colors["primary"][0] * (1 - i/height) + 230 * (i/height))
             g = int(colors["primary"][1] * (1 - i/height) + 230 * (i/height))
             b = int(colors["primary"][2] * (1 - i/height) + 230 * (i/height))
             draw.line([(0, i), (width, i)], fill=(r, g, b))
-
+        
+        # Fonts
         headline_font = load_font("Montserrat-Bold.ttf", 48)
-        wrapped_headline = textwrap.fill(headline, width=20)
-        draw.text((width//2, 100), wrapped_headline, fill=(0, 0, 0), font=headline_font, anchor="mm", align="center")
-
-        badge_font = load_font("Montserrat-Medium.ttf", 36)
-        badge_text = f"{business_type.upper()} SERVICES"
-        draw.text((width//2, 200), badge_text, fill=colors["primary"], font=badge_font, anchor="mm")
-
         desc_font = load_font("Montserrat-Regular.ttf", 28)
-        wrapped_desc = textwrap.fill(description, width=30)
-        draw.multiline_text((width//2, 400), wrapped_desc, fill=(50, 50, 50), font=desc_font, anchor="mm", align="center")
-
         phone_font = load_font("Montserrat-SemiBold.ttf", 32)
-        draw.text((width//2, height-100), f"📞 {phone_number}", fill=colors["accent"], font=phone_font, anchor="mm")
+        hashtags_font = load_font("Montserrat-Medium.ttf", 24)
 
+        # Headline
+        draw.multiline_text((width//2, 100), textwrap.fill(headline, width=20),
+                            fill=(0,0,0), font=headline_font, anchor="mm", align="center")
+        
+        # Description
+        draw.multiline_text((width//2, 350), textwrap.fill(description, width=35),
+                            fill=(50,50,50), font=desc_font, anchor="mm", align="center")
+        
+        # Phone
+        draw.text((width//2, height-120), f"📞 {phone_number}",
+                  fill=colors["accent"], font=phone_font, anchor="mm")
+        
+        # Optional Hashtags
+        if hashtags:
+            hashtags_text = " ".join(hashtags)
+            draw.text((width//2, height-60), hashtags_text,
+                      fill=(80, 80, 80), font=hashtags_font, anchor="mm")
+        
         return image
+    
     except Exception as e:
         st.error(f"Error in modern template: {e}")
         return None
 
-def create_template_minimal(business_type, headline, description, phone_number, colors):
-    try:
-        width, height = 800, 800
-        image = Image.new('RGB', (width, height), color=(248, 248, 248))
-        draw = ImageDraw.Draw(image)
 
-        draw.rectangle([0, 0, width, 80], fill=colors["primary"])
-
-        headline_font = load_font("Montserrat-Bold.ttf", 52)
-        wrapped_headline = textwrap.fill(headline, width=18)
-        draw.text((width//2, 200), wrapped_headline, fill=colors["primary"], font=headline_font, anchor="mm", align="center")
-
-        desc_font = load_font("Montserrat-Light.ttf", 28)
-        wrapped_desc = textwrap.fill(description, width=35)
-        draw.multiline_text((width//2, 400), wrapped_desc, fill=(80, 80, 80), font=desc_font, anchor="mm", align="center")
-
-        phone_font = load_font("Montserrat-SemiBold.ttf", 30)
-        draw.text((width//2, height-100), phone_number, fill=colors["accent"], font=phone_font, anchor="mm")
-
-        return image
-    except Exception as e:
-        st.error(f"Error in minimal template: {e}")
-        return None
-
-def create_template_bold(business_type, headline, description, phone_number, colors):
-    try:
-        width, height = 800, 800
-        image = Image.new('RGB', (width, height), color=colors["primary"])
-        draw = ImageDraw.Draw(image)
-
-        card_width, card_height = 600, 500
-        card_x, card_y = (width - card_width) // 2, (height - card_height) // 2
-        draw.rectangle([card_x, card_y, card_x+card_width, card_y+card_height], fill=(255, 255, 255))
-
-        headline_font = load_font("Montserrat-Bold.ttf", 44)
-        wrapped_headline = textwrap.fill(headline, width=18)
-        draw.multiline_text((width//2, card_y + 100), wrapped_headline, fill=colors["primary"], font=headline_font, anchor="mm", align="center")
-
-        desc_font = load_font("Montserrat-SemiBold.ttf", 26)
-        wrapped_desc = textwrap.fill(description, width=32)
-        draw.multiline_text((width//2, card_y + 300), wrapped_desc, fill=(70, 70, 70), font=desc_font, anchor="mm", align="center")
-
-        phone_font = load_font("Montserrat-Bold.ttf", 32)
-        draw.text((width//2, height-80), f"CALL: {phone_number}", fill=(255, 255, 255), font=phone_font, anchor="mm")
-
-        return image
-    except Exception as e:
-        st.error(f"Error in bold template: {e}")
-        return None
-
-def create_social_media_graphic(template_type, business_type, headline, description, phone_number):
-    color_schemes = {
-        "Plumbing": {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)},
-        "Cleaning": {"primary": (30, 110, 40), "secondary": (80, 180, 120), "accent": (255, 193, 7)},
-        "Landscaping": {"primary": (40, 120, 45), "secondary": (100, 180, 105), "accent": (255, 167, 38)},
-        "HVAC": {"primary": (180, 30, 30), "secondary": (220, 70, 70), "accent": (66, 133, 244)},
-        "Electrical": {"primary": (110, 25, 140), "secondary": (160, 90, 180), "accent": (255, 214, 0)}
-    }
-    colors = color_schemes.get(business_type, color_schemes["Plumbing"])
+def create_social_media_graphic(template_type, business_type, headline, description, phone_number, hashtags=None):
+    colors = {"primary": (0, 90, 180), "accent": (255, 140, 0)}
+    
     if template_type == "Modern Professional":
-        return create_template_modern(business_type, headline, description, phone_number, colors)
-    elif template_type == "Clean & Minimal":
-        return create_template_minimal(business_type, headline, description, phone_number, colors)
-    elif template_type == "Bold & Energetic":
-        return create_template_bold(business_type, headline, description, phone_number, colors)
+        return create_template_modern(business_type, headline, description, phone_number, colors, hashtags)
+    # Add your other templates (Minimal, Bold) here if you want hashtags too
     else:
-        return create_template_modern(business_type, headline, description, phone_number, colors)
+        return create_template_modern(business_type, headline, description, phone_number, colors, hashtags)
 
-# --------------------------------------------------
-# SIDEBAR
-# --------------------------------------------------
+
+# ==== Sidebar ====
 with st.sidebar:
-    st.header("💰 Pricing")
-    st.write("**Free:** 10 graphics/month")
-    st.write("**Pro ($29/month):** Unlimited + AI Content")
-    st.write("**Business ($49/month):** White labeling")
-
     st.header("💳 Upgrade Now")
     if st.button("Start $29/month Pro Plan", key="pro_upgrade"):
         st.success("Pro plan selected!")
         st.info("Contact: hello.contentos@gmail.com")
-
     st.header("💡 Need Help?")
     st.write("Email: hello.contentos@gmail.com")
-    st.write("24-48 hour response time")
 
-# --------------------------------------------------
-# MAIN CONTENT
-# --------------------------------------------------
+# ==== Main Content Tabs ====
 tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
 
 with tab1:
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([2,1])
     with col1:
-        business_type = st.selectbox(
-            "Business Type:",
-            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-            key="business_type_main"
-        )
-        template_type = st.selectbox(
-            "Design Template:",
-            ["Modern Professional", "Clean & Minimal", "Bold & Energetic"],
-            key="template_type_main"
-        )
+        business_type = st.selectbox("Business Type:", ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"], key="business_type_main")
+        template_type = st.selectbox("Design Template:", ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], key="template_type_main")
         phone_number = st.text_input("Phone Number", value="(555) 123-4567", key="phone_main")
+        headline = st.text_input("Headline", value=f"Professional {business_type} Services", key="headline_main")
+        description = st.text_area("Description", value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today.", key="desc_main")
 
-        st.markdown("### 💡 AI Assistance")
-        tone = st.selectbox("Select tone for AI suggestion:", ["Professional", "Friendly", "Persuasive", "Funny"], key="tone_select")
-
-        if st.button("✨ Suggest AI Text (Gemini)", key="gemini_suggest_btn"):
-            with st.spinner("Generating ideas with Gemini..."):
-                ai_text = generate_gemini_copy(business_type, tone)
-                if ai_text:
-                    st.session_state["headline_main"] = ai_text["headline"]
-                    st.session_state["desc_main"] = ai_text["description"] + "\n\n" + " ".join(ai_text["hashtags"])
-                    st.success("✅ Gemini generated your content!")
-
-        headline = st.text_input("Headline", value=st.session_state.get("headline_main", f"Professional {business_type} Services"), key="headline_main")
-        description = st.text_area("Description", value=st.session_state.get("desc_main", f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."), key="desc_main")
-
+        # === AI Suggest Button ===
         if st.button("Generate Graphic", type="primary", key="generate_btn"):
             if headline and description and phone_number:
-                with st.spinner("Creating your professional graphic..."):
-                    try:
-                        image = create_social_media_graphic(template_type, business_type, headline, description, phone_number)
-                        st.success("✅ Image created successfully!")
-                        image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
-                        os.makedirs("output", exist_ok=True)
-                        image.save(image_path)
-                        st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
-                        with open(image_path, "rb") as file:
-                            st.download_button(label="📥 Download Graphic", data=file, file_name=f"{business_type}_social_post.png", mime="image/png", key="download_btn")
-                    except Exception as e:
-                        st.error(f"❌ Error creating graphic: {str(e)}")
-                        st.info("Please check if all fonts are properly installed.")
+                # Extract hashtags from description if AI suggested
+                hashtags_list = []
+                if "#" in description:
+                    hashtags_list = [tag for tag in description.split() if tag.startswith("#")]
+
+                image = create_social_media_graphic(template_type, business_type, headline, description, phone_number, hashtags_list)
+                os.makedirs("output", exist_ok=True)
+                image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
+                image.save(image_path)
+                st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
+                with open(image_path, "rb") as file:
+                    st.download_button("📥 Download Graphic", file, file_name=f"{business_type}_social_media_post.png", mime="image/png")
+            else:
+                st.warning("⚠️ Please fill in all fields before generating.")
+
+
+        # === Generate Graphic Button ===
+        if st.button("Generate Graphic", type="primary", key="generate_btn"):
+            if headline and description and phone_number:
+                image = create_social_media_graphic(template_type, business_type, headline, description, phone_number)
+                os.makedirs("output", exist_ok=True)
+                image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
+                image.save(image_path)
+                st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
+                with open(image_path, "rb") as file:
+                    st.download_button("📥 Download Graphic", file, file_name=f"{business_type}_social_media_post.png", mime="image/png")
             else:
                 st.warning("⚠️ Please fill in all fields before generating.")
 
@@ -347,22 +236,11 @@ with tab1:
 
 with tab2:
     st.header("30-Day Content Ideas")
-    content_ideas = [
-        "Monday: Service highlight of the week",
-        "Tuesday: Customer testimonial",
-        "Wednesday: Educational tip",
-        "Thursday: Before/after transformation",
-        "Friday: Weekend special offer",
-        "Saturday: Team spotlight",
-        "Sunday: Industry news"
-    ]
+    content_ideas = ["Monday: Service highlight", "Tuesday: Customer testimonial", "Wednesday: Educational tip",
+                     "Thursday: Before/after transformation", "Friday: Weekend special offer",
+                     "Saturday: Team spotlight", "Sunday: Industry news"]
     for idea in content_ideas:
         st.write(f"✅ {idea}")
-    st.download_button(
-        label="📥 Download Content Calendar",
-        data=json.dumps(content_ideas, indent=2),
-        file_name="content_calendar.json",
-        mime="application/json"
-    )
+    st.download_button("📥 Download Content Calendar", data=json.dumps(content_ideas, indent=2), file_name="content_calendar.json", mime="application/json")
 
 st.success("✨ Ready to generate professional social media graphics!")
