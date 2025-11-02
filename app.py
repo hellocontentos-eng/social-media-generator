@@ -264,7 +264,7 @@ with tab1:
         business_type = st.selectbox(
             "Business Type:",
             ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-            key="business_type_sidebar"
+            key="business_type_main"  # ← CORRECT KEY
         )
         
         template_type = st.selectbox(
