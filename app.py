@@ -60,7 +60,7 @@ def generate_ai_content(business_type, content_type="headline"):
     
     try:
         st.write(f"🔍 DEBUG: Calling Gemini API for {content_type}...")
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-8b')  # or try 'gemini-pro'
         response = model.generate_content(content_prompts[content_type])
         result = response.text.strip().strip('"')
         st.write(f"🔍 DEBUG: Gemini raw response: '{response.text}'")
