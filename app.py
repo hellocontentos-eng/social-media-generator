@@ -45,7 +45,7 @@ with tab1:
         business_type = st.selectbox(
             "Business Type:",
             ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-            key="business_type_main"
+            key="business_type_quick"
         )            
         
         
@@ -260,36 +260,19 @@ def create_social_media_graphic(template_type, business_type, headline, descript
     return templates[template_type](business_type, headline, description, phone_number, colors)
 # Sidebar
 with st.sidebar:
-    st.header("🚀 Upgrade to Pro")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("💳 $29/month", use_container_width=True, key="pro_btn"):
-            st.success("Pro plan selected!")
-            st.info("Contact: hello.contentos@gmail.com")
-    with col2:
-        if st.button("🏢 $49/month", use_container_width=True, key="business_btn"):
-            st.success("Business plan selected!")
-            st.info("Contact: hello.contentos@gmail.com")
+    st.header("💰 Pricing")
+    st.write("**Free:** 10 graphics/month")
+    st.write("**Pro ($29/month):** Unlimited + AI Content")
+    st.write("**Business ($49/month):** White labeling")
     
-    st.write("**Pro features:** Unlimited graphics, AI content, bulk generation")
-    st.write("**Business features:** White labeling, custom templates")
+    st.header("💳 Upgrade Now")
+    if st.button("Start $29/month Pro Plan", key="pro_upgrade"):
+        st.success("Pro plan selected!")
+        st.info("Contact: hello.contentos@gmail.com")
     
-    st.divider()  # Adds a separation line
-    
-    # Quick generator in sidebar
-    st.header("🎨 Quick Create")
-    st.write("Generate a graphic in 30 seconds:")
-    
-    quick_business = st.selectbox(
-        "Your Business:",
-        ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-        key="quick_business"
-    )
-    
-    if st.button("🚀 Create Quick Graphic", key="quick_btn"):
-        st.session_state.quick_generate = True
-        st.rerun()
-
+    st.header("💡 Need Help?")
+    st.write("Email: hello.contentos@gmail.com")
+    st.write("24-48 hour response time")
 with tab1:
     col1, col2 = st.columns([2, 1])
     
@@ -297,7 +280,7 @@ with tab1:
         business_type = st.selectbox(
             "Business Type:",
             ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-            key="business_type_main"
+            key="business_type_sidebar"
         )
         
         template_type = st.selectbox(
