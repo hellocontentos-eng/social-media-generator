@@ -23,9 +23,10 @@ st.markdown("""
 
 # ---------------- Metrics ----------------
 metric_col1, metric_col2, metric_col3 = st.columns(3)
-metric_col1.metric("Graphics Created", "1,234+", key="metric_graphics")
-metric_col2.metric("Businesses Helped", "250+", key="metric_businesses")
-metric_col3.metric("Time Saved", "2,100+ hours", key="metric_time_saved")
+metric_col1.metric("Graphics Created", "1,234+")
+metric_col2.metric("Businesses Helped", "250+")
+metric_col3.metric("Time Saved", "2,100+ hours")
+
 
 st.markdown("---")
 
