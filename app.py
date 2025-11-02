@@ -13,7 +13,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# HERO SECTION - Add at the top after imports
+# HERO SECTION (your current code)
 st.markdown("""
 <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
     <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">🚀 Create Social Media Graphics That Get Customers</h1>
@@ -24,15 +24,49 @@ st.markdown("""
 
 st.markdown("---")
 
+# ========== ADD GENERATOR FORM RIGHT HERE ==========
+st.header("🎨 Create Your First Graphic Now!")
+
+tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
+
+with tab1:
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        business_type = st.selectbox(
+            "Business Type:",
+            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"]
+        )
+        
+        # ... REST OF YOUR EXISTING GENERATOR CODE ...
+        # Copy all your current form code here
+
 # EXAMPLE GALLERY - Add before the form
+# Replace the broken image URLs with these working ones:
 st.subheader("🎨 See What You'll Create")
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.image("https://via.placeholder.com/300x300/007bff/ffffff?text=Plumbing+Post", caption="Plumbing Service Post")
+    st.image("https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300", caption="Professional Plumbing Post")
 with col2:
-    st.image("https://via.placeholder.com/300x300/28a745/ffffff?text=Cleaning+Post", caption="Cleaning Service Post") 
+    st.image("https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=300", caption="Cleaning Service Post")
 with col3:
-    st.image("https://via.placeholder.com/300x300/dc3545/ffffff?text=HVAC+Post", caption="HVAC Service Post")
+    st.image("https://images.unsplash.com/photo-1581993192008-63fd1ea7de1a?w=300", caption="HVAC Service Post")
+    
+
+st.markdown("---")
+st.subheader("🚀 How It Works - 3 Simple Steps")
+
+steps_col1, steps_col2, steps_col3 = st.columns(3)
+with steps_col1:
+    st.markdown("### 1. 📝 Enter Your Details")
+    st.write("Business type, phone, custom text")
+with steps_col2:
+    st.markdown("### 2. 🎨 Choose Template")  
+    st.write("Pick from professional designs")
+with steps_col3:
+    st.markdown("### 3. 📥 Download & Post")
+    st.write("Ready-to-use social media graphic")
+    
     
 # TESTIMONIALS
 st.subheader("💬 What Business Owners Say")
@@ -47,6 +81,46 @@ with testimonial_col2:
     **"Finally, professional graphics without hiring a designer. Worth every penny!"**
     - Sarah L., Cleaning Service
     """)
+
+st.markdown("---")
+st.subheader("💰 Choose Your Plan")
+
+pricing_col1, pricing_col2, pricing_col3 = st.columns(3)
+
+with pricing_col1:
+    st.markdown("### 🆓 Starter")
+    st.write("**$0/month**")
+    st.write("• 10 graphics/month")
+    st.write("• Basic templates")
+    st.write("• Standard support")
+    
+with pricing_col2:
+    st.markdown("### ⭐ Pro")
+    st.write("**$29/month**")
+    st.write("• Unlimited graphics")
+    st.write("• All templates + AI")
+    st.write("• Priority support")
+    
+with pricing_col3:
+    st.markdown("### 🏢 Business")
+    st.write("**$49/month**")
+    st.write("• White labeling")
+    st.write("• Custom templates")
+    st.write("• Dedicated support")
+    
+
+st.markdown("---")
+st.subheader("❓ Frequently Asked Questions")
+
+with st.expander("How many graphics can I create?"):
+    st.write("Free plan: 10/month | Pro/Business: Unlimited")
+    
+with st.expander("What social media platforms are supported?"):
+    st.write("All platforms: Instagram, Facebook, LinkedIn, Twitter")
+    
+with st.expander("Can I use my own branding?"):
+    st.write("Yes! Business plan includes custom colors and logos")
+    
     
 # Load fonts
 def load_font(font_name, size):
