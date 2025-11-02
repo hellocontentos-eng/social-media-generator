@@ -51,35 +51,50 @@ BACKGROUND_LIBRARY = {
     ]
 }
 
+
 def generate_ai_content(business_type, content_type="headline"):
-    """Generate smart marketing content using Gemini FREE tier models only"""
+    """Generate smart marketing content using available free-tier Gemini models only"""
 
     content_prompts = {
-        "headline": f"Create a compelling, catchy headline for a {business_type} business social media post. Return only the headline text.",
-        "description": f"Write a short, engaging description for a {business_type} company social media post. Return only the description text.",
+        "headline": f"Create a compelling headline for a {business_type} business social media post. Return only headline.",
+        "description": f"Write a short description for a {business_type} company social media post. Return only description.",
     }
 
-    # ✅ Use correct Gemini model names (no "models/" prefix)
-    free_tier_models = [
-        "gemini-1.5-flash",       # Primary free-tier model (fast + free)
-        "gemini-1.5-flash-001",   # Backup model
-    ]
+    # STEP 1: Get all available models
+    st.write("🔍 Fetching available Gemini models...")
+    try:
+        models = genai.list_models()
+    except Exception as e:
+        st.error(f"❌ Failed to list models: {e}")
+        return get_fallback_content(business_type, content_type)
 
-    for model_name in free_tier_models:
+    # STEP 2: Filter for models that support generate_content
+    free_models = []
+    for m in models:
+        if "generate_content" in m.available_methods:
+            free_models.append(m.name)
+
+    if not free_models:
+        st.error("❌ No free-tier models available. Using fallback content.")
+        return get_fallback_content(business_type, content_type)
+
+    # STEP 3: Try each free model until one works
+    for model_name in free_models:
         try:
-            st.write(f"🎯 Trying FREE model: {model_name}")
+            st.write(f"🎯 Trying model: {model_name}")
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(content_prompts[content_type])
             result = response.text.strip().strip('"')
-            st.success(f"✅ Using FREE model: {model_name}")
+            st.success(f"✅ Using model: {model_name}")
             return result
         except Exception as e:
             st.warning(f"❌ {model_name} failed: {e}")
             continue
 
-    # 🔁 If all models fail, fallback
-    st.error("❌ No free tier models available. Using fallback content.")
+    # STEP 4: Fallback if all fail
+    st.error("❌ All models failed. Using fallback content.")
     return get_fallback_content(business_type, content_type)
+
 
 def get_fallback_content(business_type, content_type):
     """Enhanced fallback content for when AI fails"""
