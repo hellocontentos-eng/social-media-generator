@@ -12,7 +12,17 @@ st.set_page_config(
     page_icon="🎯",
     layout="wide"
 )
-
+# Add at the top after hero section
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.page_link("#create-your-first-graphic-now", label="🎨 Create Graphic")
+with col2:
+    st.page_link("#see-what-youll-create", label="📸 Examples") 
+with col3:
+    st.page_link("#what-business-owners-say", label="💬 Reviews")
+with col4:
+    st.page_link("#choose-your-plan", label="💰 Pricing")
+    
 # HERO SECTION (your current code)
 st.markdown("""
 <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
@@ -23,7 +33,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("---")
-
+# Add below hero section
+st.markdown("---")
+metric_col1, metric_col2, metric_col3 = st.columns(3)
+with metric_col1:
+    st.metric("Graphics Created", "1,234+")
+with metric_col2:
+    st.metric("Businesses Helped", "250+")
+with metric_col3:
+    st.metric("Time Saved", "2,100+ hours")
 # ========== ADD GENERATOR FORM RIGHT HERE ==========
 st.header("🎨 Create Your First Graphic Now!")
 
@@ -249,31 +267,37 @@ def create_social_media_graphic(template_type, business_type, headline, descript
     }
     
     return templates[template_type](business_type, headline, description, phone_number, colors)
-
 # Sidebar
 with st.sidebar:
-    st.header("💰 Pricing")
-    st.write("**Free:** 10 graphics/month")
-    st.write("**Pro ($29/month):** Unlimited + AI Content")
-    st.write("**Business ($49/month):** White labeling")
+    st.header("🚀 Upgrade to Pro")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("💳 $29/month", use_container_width=True, key="pro_btn"):
+            st.success("Pro plan selected!")
+            st.info("Contact: hello.contentos@gmail.com")
+    with col2:
+        if st.button("🏢 $49/month", use_container_width=True, key="business_btn"):
+            st.success("Business plan selected!")
+            st.info("Contact: hello.contentos@gmail.com")
     
-    # ADD THIS PAYMENT SECTION:
-    st.header("💳 Upgrade to Pro")
-    if st.button("Start $29/month Pro Plan"):
-        st.success("Redirecting to secure checkout...")
-        st.info("Payment processing coming soon! For now, contact us at hello.contentos@gmail.com")
+    st.write("**Pro features:** Unlimited graphics, AI content, bulk generation")
+    st.write("**Business features:** White labeling, custom templates")
     
-    # Your existing sidebar content continues below...
-    st.header("📝 Customize Your Post")
-    business_type = st.selectbox(
-        "Business Type:",
+    st.divider()  # Adds a separation line
+    
+    # Quick generator in sidebar
+    st.header("🎨 Quick Create")
+    st.write("Generate a graphic in 30 seconds:")
+    
+    quick_business = st.selectbox(
+        "Your Business:",
         ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
-        key="business_type_sidebar"  # ← ADD THIS
+        key="quick_business"
     )
-    # ... rest of your existing sidebar code
-
-# Main content
-tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
+    
+    if st.button("🚀 Create Quick Graphic", key="quick_btn"):
+        st.session_state.quick_generate = True
+        st.rerun()
 
 with tab1:
     col1, col2 = st.columns([2, 1])
@@ -281,44 +305,55 @@ with tab1:
     with col1:
         business_type = st.selectbox(
             "Business Type:",
-            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"]
+            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"],
+            key="business_type_main"
         )
         
         template_type = st.selectbox(
             "Design Template:",
             ["Modern Professional", "Clean & Minimal", "Bold & Energetic"],
-            key="template_type_main"  # ← ADD THIS
+            key="template_type_main"
         )
         
-        phone_number = st.text_input("Phone Number", value="(555) 123-4567")
-        headline = st.text_input("Headline", value=f"Professional {business_type} Services")
-        description = st.text_area("Description", value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today.")
+        phone_number = st.text_input("Phone Number", value="(555) 123-4567", key="phone_main")
+        headline = st.text_input("Headline", value=f"Professional {business_type} Services", key="headline_main")
+        description = st.text_area("Description", value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today.", key="desc_main")
         
-        if st.button("Generate Graphic", type="primary"):
-            with st.spinner("Creating your graphic..."):
-                image = create_social_media_graphic(
-                    template_type,
-                    business_type, 
-                    headline, 
-                    description, 
-                    phone_number
-                )
-                
-                # Save and display
-                image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
-                os.makedirs("output", exist_ok=True)
-                image.save(image_path)
-                
-                st.image(image_path, use_column_width=True)
-                
-                # Download button
-                with open(image_path, "rb") as file:
-                    st.download_button(
-                        label="📥 Download Graphic",
-                        data=file,
-                        file_name=f"{business_type}_social_media.png",
-                        mime="image/png"
-                    )
+        if st.button("Generate Graphic", type="primary", key="generate_btn"):
+            if headline and description and phone_number:
+                with st.spinner("Creating your professional graphic..."):
+                    try:
+                        image = create_social_media_graphic(
+                            template_type,
+                            business_type, 
+                            headline, 
+                            description, 
+                            phone_number
+                        )
+                        
+                        # Save and display
+                        image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
+                        os.makedirs("output", exist_ok=True)
+                        image.save(image_path)
+                        
+                        st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
+                        
+                        # Download button
+                        with open(image_path, "rb") as file:
+                            st.download_button(
+                                label="📥 Download Graphic",
+                                data=file,
+                                file_name=f"{business_type}_social_media_post.png",
+                                mime="image/png",
+                                key="download_btn"
+                            )
+                        st.success("✅ Graphic created successfully! Download and share on social media.")
+                        
+                    except Exception as e:
+                        st.error(f"❌ Error creating graphic: {str(e)}")
+                        st.info("Please check if all fonts are properly installed.")
+            else:
+                st.warning("⚠️ Please fill in all fields before generating.")
 
     with col2:
         st.header("💡 Tips")
