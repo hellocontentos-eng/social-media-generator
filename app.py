@@ -106,39 +106,41 @@ def create_template_modern(business_type, headline, description, phone_number, c
         background = load_background_image(business_type)
         draw = ImageDraw.Draw(background)
         
-        # Add semi-transparent overlay for readability
-        overlay = Image.new('RGBA', background.size, (255, 255, 255, 180))
+        # Lighter overlay for less dull effect (reduced from 180 to 120)
+        overlay = Image.new('RGBA', background.size, (255, 255, 255, 120))
         background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(background)
         
-        # Headline with modern styling
-        headline_font = load_font("Montserrat-Bold.ttf", 72)
-        wrapped_headline = textwrap.fill(headline, width=15)
-        draw.text((540, 200), wrapped_headline, fill=colors["primary"], 
-                  font=headline_font, anchor="mm", align="center")
+        # LARGER Headline (increased from 72 to 90)
+        headline_font = load_font("Montserrat-Bold.ttf", 90)
+        wrapped_headline = textwrap.fill(headline, width=12)  # Fewer words per line
+        draw.text((540, 250), wrapped_headline, fill=colors["primary"], 
+                  font=headline_font, anchor="mm", align="center", 
+                  stroke_width=2, stroke_fill=(255, 255, 255))
         
-        # Business badge
-        badge_font = load_font("Montserrat-Medium.ttf", 36)
+        # LARGER Business badge (increased from 36 to 48)
+        badge_font = load_font("Montserrat-Medium.ttf", 48)
         badge_text = f"{business_type.upper()} SERVICES"
-        draw.text((540, 320), badge_text, fill=colors["accent"], font=badge_font, anchor="mm")
+        draw.text((540, 350), badge_text, fill=colors["accent"], 
+                  font=badge_font, anchor="mm", stroke_width=1, stroke_fill=(255, 255, 255))
         
-        # Description with background
-        desc_font = load_font("Montserrat-Regular.ttf", 32)
-        wrapped_desc = textwrap.fill(description, width=30)
+        # LARGER Description (increased from 32 to 42)
+        desc_font = load_font("Montserrat-Regular.ttf", 42)
+        wrapped_desc = textwrap.fill(description, width=25)  # Fewer words per line
         
-        # Add semi-transparent background for description
-        desc_bbox = draw.multiline_textbbox((540, 540), wrapped_desc, font=desc_font, anchor="mm")
-        padding = 20
+        # Better background for description
+        desc_bbox = draw.multiline_textbbox((540, 550), wrapped_desc, font=desc_font, anchor="mm")
+        padding = 25
         draw.rectangle([desc_bbox[0]-padding, desc_bbox[1]-padding, desc_bbox[2]+padding, desc_bbox[3]+padding], 
-                       fill=(255, 255, 255, 200), outline=colors["primary"], width=2)
+                       fill=(255, 255, 255, 220), outline=colors["primary"], width=3)
         
-        draw.multiline_text((540, 540), wrapped_desc, fill=(50, 50, 50), 
+        draw.multiline_text((540, 550), wrapped_desc, fill=(50, 50, 50), 
                            font=desc_font, anchor="mm", align="center")
         
-        # Contact section
-        contact_font = load_font("Montserrat-SemiBold.ttf", 36)
-        draw.text((540, 850), f"📞 {phone_number}", fill=colors["primary"], 
-                  font=contact_font, anchor="mm")
+        # LARGER Contact section (increased from 36 to 48)
+        contact_font = load_font("Montserrat-SemiBold.ttf", 48)
+        draw.text((540, 800), f"📞 {phone_number}", fill=colors["primary"], 
+                  font=contact_font, anchor="mm", stroke_width=1, stroke_fill=(255, 255, 255))
         
         return background
         
@@ -152,35 +154,38 @@ def create_template_minimal(business_type, headline, description, phone_number, 
         background = load_background_image(business_type)
         draw = ImageDraw.Draw(background)
         
-        # Add dark overlay for text readability
-        overlay = Image.new('RGBA', background.size, (0, 0, 0, 120))
+        # Lighter overlay (reduced from 120 to 80)
+        overlay = Image.new('RGBA', background.size, (0, 0, 0, 80))
         background = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(background)
         
-        # Headline
-        headline_font = load_font("Montserrat-Bold.ttf", 64)
-        wrapped_headline = textwrap.fill(headline, width=16)
+        # LARGER Headline (increased from 64 to 80)
+        headline_font = load_font("Montserrat-Bold.ttf", 80)
+        wrapped_headline = textwrap.fill(headline, width=14)
         draw.text((540, 300), wrapped_headline, fill=(255, 255, 255), 
-                  font=headline_font, anchor="mm", align="center")
+                  font=headline_font, anchor="mm", align="center", 
+                  stroke_width=2, stroke_fill=(0, 0, 0))
         
         # Separator
-        draw.line([(390, 400), (690, 400)], fill=colors["accent"], width=4)
+        draw.line([(340, 420), (740, 420)], fill=colors["accent"], width=6)
         
-        # Description
-        desc_font = load_font("Montserrat-Light.ttf", 28)
-        wrapped_desc = textwrap.fill(description, width=35)
+        # LARGER Description (increased from 28 to 36)
+        desc_font = load_font("Montserrat-Light.ttf", 36)
+        wrapped_desc = textwrap.fill(description, width=30)
         draw.multiline_text((540, 550), wrapped_desc, fill=(255, 255, 255), 
-                           font=desc_font, anchor="mm", align="center", spacing=10)
+                           font=desc_font, anchor="mm", align="center", spacing=15,
+                           stroke_width=1, stroke_fill=(0, 0, 0))
         
-        # Phone in circle
-        phone_font = load_font("Montserrat-SemiBold.ttf", 32)
-        circle_center = (540, 800)
-        circle_radius = 60
+        # LARGER Phone section
+        phone_font = load_font("Montserrat-SemiBold.ttf", 42)  # Increased from 32
+        circle_center = (540, 750)
+        circle_radius = 80  # Larger circle
         draw.ellipse([circle_center[0]-circle_radius, circle_center[1]-circle_radius,
                       circle_center[0]+circle_radius, circle_center[1]+circle_radius], 
                      fill=colors["accent"])
         draw.text(circle_center, "📞", fill=(255, 255, 255), font=phone_font, anchor="mm")
-        draw.text((540, 880), phone_number, fill=(255, 255, 255), font=phone_font, anchor="mm")
+        draw.text((540, 850), phone_number, fill=(255, 255, 255), 
+                  font=phone_font, anchor="mm", stroke_width=1, stroke_fill=(0, 0, 0))
         
         return background
         
@@ -270,29 +275,7 @@ with metric_col2:
 with metric_col3:
     st.metric("Time Saved", "2,100+ hours")
 
-# EXAMPLE GALLERY
-st.subheader("🎨 See What You'll Create")
-
-# Create sample graphics to show users
-try:
-    # Sample 1: Plumbing
-    sample_bg1 = load_background_image("Plumbing")
-    draw1 = ImageDraw.Draw(sample_bg1)
-    headline_font = load_font("Montserrat-Bold.ttf", 60)
-    draw1.text((540, 300), "24/7 Plumbing\nServices", fill=(255, 255, 255), font=headline_font, anchor="mm", align="center")
-    draw1.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), font=headline_font, anchor="mm")
-    
-    # Sample 2: Cleaning
-    sample_bg2 = load_background_image("Cleaning") 
-    draw2 = ImageDraw.Draw(sample_bg2)
-    draw2.text((540, 300), "Sparkling Clean\nResults", fill=(255, 255, 255), font=headline_font, anchor="mm", align="center")
-    draw2.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), font=headline_font, anchor="mm")
-    
-    # Sample 3: HVAC
-    sample_bg3 = load_background_image("HVAC")
-    draw3 = ImageDraw.Draw(sample_bg3)
-    draw3.text((540, 300), "HVAC Experts\n24/7 Service", fill=(255, 255, 255), font=headline_font, anchor="mm", align="center")
-    draw3.text((540, 500), "📞 (555) 123-4567", fill=(255, 255, 255), font=headline_font, anchor="mm")
+🎨 See What You'll Create
     
     # Display the sample graphics
     col1, col2, col3 = st.columns(3)
