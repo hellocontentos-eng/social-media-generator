@@ -278,40 +278,45 @@ with tab1:
         description = st.text_area("Description", value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today.", key="desc_main")
         
         if st.button("Generate Graphic", type="primary", key="generate_btn"):
-            if headline and description and phone_number:
-                with st.spinner("Creating your professional graphic..."):
-                    try:
-                        image = create_social_media_graphic(
-                            template_type,
-                            business_type, 
-                            headline, 
-                            description, 
-                            phone_number
-                        )
-                        
-                        # Save and display
-                        image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
-                        os.makedirs("output", exist_ok=True)
-                        image.save(image_path)
-                        
-                        st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
-                        
-                        # Download button
-                        with open(image_path, "rb") as file:
-                            st.download_button(
-                                label="📥 Download Graphic",
-                                data=file,
-                                file_name=f"{business_type}_social_media_post.png",
-                                mime="image/png",
-                                key="download_btn"
-                            )
-                        st.success("✅ Graphic created successfully! Download and share on social media.")
-                        
-                    except Exception as e:
-                        st.error(f"❌ Error creating graphic: {str(e)}")
-                        st.info("Please check if all fonts are properly installed.")
-            else:
-                st.warning("⚠️ Please fill in all fields before generating.")
+    if headline and description and phone_number:
+        with st.spinner("Creating your professional graphic..."):
+            try:
+                # DEBUG: Show what values are being used
+                st.write(f"🔧 Debug: Business={business_type}, Template={template_type}")
+                st.write(f"🔧 Debug: Headline='{headline}'")
+                
+                image = create_social_media_graphic(
+                    template_type,
+                    business_type, 
+                    headline, 
+                    description, 
+                    phone_number
+                )
+                
+                st.success("✅ Image created successfully!")
+                
+                # Save and display
+                image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
+                os.makedirs("output", exist_ok=True)
+                image.save(image_path)
+                
+                st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
+                
+                # Download button
+                with open(image_path, "rb") as file:
+                    st.download_button(
+                        label="📥 Download Graphic",
+                        data=file,
+                        file_name=f"{business_type}_social_media_post.png",
+                        mime="image/png",
+                        key="download_btn"
+                    )
+                
+            except Exception as e:
+                st.error(f"❌ Error creating graphic: {str(e)}")
+                st.info("Please check if all fonts are properly installed.")
+    else:
+        st.warning("⚠️ Please fill in all fields before generating.")
 
     with col2:
         st.header("💡 Tips")
