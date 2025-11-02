@@ -190,6 +190,7 @@ tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
 
 with tab1:
     col1, col2 = st.columns([2, 1])
+
     with col1:
         # --- Business & Template Selection ---
         business_type = st.selectbox(
@@ -202,29 +203,42 @@ with tab1:
             ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], 
             key="tab1_template_type"
         )
-        
-        # --- User Inputs ---
+
+        # --- Initialize session state safely ---
+        if "tab1_phone" not in st.session_state:
+            st.session_state.tab1_phone = "(555) 123-4567"
+        if "tab1_headline" not in st.session_state:
+            st.session_state.tab1_headline = f"Professional {business_type} Services"
+        if "tab1_description" not in st.session_state:
+            st.session_state.tab1_description = f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."
+
+        # --- Text Inputs ---
         phone_number = st.text_input(
             "Phone Number", 
-            value="(555) 123-4567", 
+            value=st.session_state.tab1_phone, 
             key="tab1_phone"
         )
+        st.session_state.tab1_phone = phone_number
+
         headline = st.text_input(
             "Headline", 
-            value=f"Professional {business_type} Services", 
+            value=st.session_state.tab1_headline, 
             key="tab1_headline"
         )
+        st.session_state.tab1_headline = headline
+
         description = st.text_area(
             "Description", 
-            value=f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today.", 
+            value=st.session_state.tab1_description, 
             key="tab1_description"
         )
+        st.session_state.tab1_description = description
 
         # --- AI Suggest Button ---
         if st.button("💡 Suggest AI Text", key="tab1_ai_suggest"):
             if business_type:
                 with st.spinner("Generating AI copy..."):
-                    ai_result = generate_ai_copy(business_type)
+                    ai_result = generate_ai_copy(business_type)  # Your AI function
                     ai_headline = ai_result.get("headline", "")
                     ai_description_text = ai_result.get("description", "")
                     ai_hashtags = " ".join(ai_result.get("hashtags", []))
@@ -245,7 +259,7 @@ with tab1:
             if headline and description and phone_number:
                 # Extract hashtags if any
                 hashtags_list = [tag for tag in description.split() if tag.startswith("#")]
-                
+
                 # Generate image with hashtags
                 image = create_social_media_graphic(
                     template_type, 
@@ -255,12 +269,12 @@ with tab1:
                     phone_number, 
                     hashtags_list
                 )
-                
+
                 # Save and display
                 os.makedirs("output", exist_ok=True)
                 image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
                 image.save(image_path)
-                
+
                 st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
                 with open(image_path, "rb") as file:
                     st.download_button(
@@ -273,17 +287,6 @@ with tab1:
             else:
                 st.warning("⚠️ Please fill in all fields before generating.")
 
-
-    with col2:
-        st.header("💡 Tips")
-        tips = {
-            "Plumbing": "• Show before/after photos\n• Highlight emergency services\n• Share water-saving tips",
-            "Cleaning": "• Post sparkling results\n• Eco-friendly products\n• Seasonal specials",
-            "Landscaping": "• Garden transformations\n• Lawn care tips\n• Seasonal planting",
-            "HVAC": "• Maintenance tips\n• Energy efficiency\n• Emergency repairs",
-            "Electrical": "• Safety tips\n• Smart home installs\n• Code compliance"
-        }
-        st.write(tips[business_type], key="tab1_tips")
 
 with tab2:
     st.header("30-Day Content Ideas")
