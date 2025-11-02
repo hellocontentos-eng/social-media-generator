@@ -50,36 +50,52 @@ BACKGROUND_LIBRARY = {
 
 # Smart content generation with Gemini
 def generate_ai_content(business_type, content_type="headline"):
-    """Generate smart marketing content with model discovery"""
+    """Generate smart marketing content using Gemini 1.5 Flash"""
     
     content_prompts = {
-        "headline": f"Create a compelling headline for a {business_type} business social media post",
-        "description": f"Write a short description for a {business_type} company social media post",
+        "headline": f"Create a compelling, attention-grabbing headline for a {business_type} business social media post. Make it engaging and professional. Return only the headline text.",
+        "description": f"Write a short, persuasive description for a {business_type} company social media post. Highlight key benefits and include a call-to-action. Keep it under 150 characters. Return only the description text.",
     }
     
+    # FORCE USE OF GEMINI 1.5 FLASH (cheaper & faster)
     try:
-        # First, discover available models
-        available_models = []
-        for model in genai.list_models():
-            if 'generateContent' in model.supported_generation_methods:
-                available_models.append(model.name)
-        
-        st.write(f"🔍 Found {len(available_models)} available models")
-        
-        if available_models:
-            # Try the first available model
-            model_name = available_models[0]
-            st.write(f"🎯 Using model: {model_name}")
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(content_prompts[content_type])
-            return response.text.strip()
-        else:
-            st.error("❌ No text generation models available")
-            return get_fallback_content(business_type, content_type)
-            
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
+        response = model.generate_content(content_prompts[content_type])
+        result = response.text.strip().strip('"')
+        return result
     except Exception as e:
-        st.error(f"❌ API Error: {e}")
+        st.error(f"❌ Gemini 1.5 Flash failed: {str(e)[:100]}...")
+        # Use enhanced fallback content
         return get_fallback_content(business_type, content_type)
+
+def get_fallback_content(business_type, content_type):
+    """Enhanced fallback content for when AI fails"""
+    fallback_content = {
+        "Plumbing": {
+            "headline": "🚰 Emergency Plumbing Services - 24/7 Available",
+            "description": "Fast, reliable plumbing solutions! Licensed & insured professionals with upfront pricing."
+        },
+        "Cleaning": {
+            "headline": "✨ Sparkling Clean Results Guaranteed",
+            "description": "Professional cleaning services for homes & offices. Eco-friendly products & satisfaction guaranteed!"
+        },
+        "HVAC": {
+            "headline": "❄️ HVAC Services & System Maintenance",
+            "description": "Stay comfortable year-round with expert heating & cooling services. Emergency repairs available!"
+        },
+        "Electrical": {
+            "headline": "⚡ Licensed Electrical Services & Repairs", 
+            "description": "Safe, reliable electrical solutions for homes and businesses. Code-compliant & insured!"
+        },
+        "Landscaping": {
+            "headline": "🌿 Beautiful Landscaping & Lawn Care",
+            "description": "Transform your outdoor space with professional landscaping services. Free consultations available!"
+        }
+    }
+    return fallback_content.get(business_type, {
+        "headline": f"Professional {business_type} Services",
+        "description": f"Expert {business_type} solutions with quality guaranteed!"
+    })[content_type]
 
 def get_fallback_content(business_type, content_type):
     """Enhanced fallback content"""
