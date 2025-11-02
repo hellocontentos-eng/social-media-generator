@@ -4,7 +4,6 @@ from PIL import Image, ImageDraw, ImageFont
 import textwrap
 import json
 from datetime import datetime
-# import google.generativeai as genai  # Only if you use Gemini / AI functions
 
 # ---------------- App Config ----------------
 st.set_page_config(
@@ -46,9 +45,6 @@ with st.sidebar:
     st.write("Email: hello.contentos@gmail.com", key="sidebar_help_email")
     st.write("24-48 hour response time", key="sidebar_help_response")
 
-# ---------------- Tabs ----------------
-tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
-
 # ---------------- Helper Functions ----------------
 def load_font(font_name, size):
     system_fonts = {
@@ -66,7 +62,6 @@ def load_font(font_name, size):
         return ImageFont.load_default()
 
 def create_social_media_graphic(template_type, business_type, headline, description, phone_number, hashtags_list=[]):
-    # Example simple template
     width, height = 800, 800
     image = Image.new('RGB', (width, height), color=(255, 255, 255))
     draw = ImageDraw.Draw(image)
@@ -94,76 +89,87 @@ def generate_ai_copy(business_type):
         "hashtags": ["#LocalBusiness", f"#{business_type.replace(' ','')}", "#Professional"]
     }
 
-# ---------------- Tab 1: Create Graphics ----------------
+# ---------------- Tabs ----------------
+tab1, tab2 = st.tabs(["🎨 Create Graphics", "📅 Content Ideas"])
+
+# ---------------- Tab 1 ----------------
 with tab1:
-    col1, col2 = st.columns([2,1])
-    with col1:
-        # --- Business & Template Selection ---
-        business_type = st.selectbox(
-            "Business Type:", 
-            ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"], 
-            key="tab1_business_type"
-        )
-        template_type = st.selectbox(
-            "Design Template:", 
-            ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], 
-            key="tab1_template_type"
-        )
-        
-        # --- Session-state safe defaults ---
-        if "tab1_phone" not in st.session_state:
-            st.session_state.tab1_phone = "(555) 123-4567"
-        if "tab1_headline" not in st.session_state:
-            st.session_state.tab1_headline = f"Professional {business_type} Services"
-        if "tab1_description" not in st.session_state:
-            st.session_state.tab1_description = f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."
+    tab1_container = st.container()
+    with tab1_container:
+        col1, col2 = st.columns([2,1])
+        with col1:
+            # --- Business & Template Selection ---
+            business_type = st.selectbox(
+                "Business Type:", 
+                ["Plumbing", "Cleaning", "Landscaping", "HVAC", "Electrical"], 
+                key="tab1_business_type"
+            )
+            template_type = st.selectbox(
+                "Design Template:", 
+                ["Modern Professional", "Clean & Minimal", "Bold & Energetic"], 
+                key="tab1_template_type"
+            )
 
-        # --- Text Inputs ---
-        phone_number = st.text_input("Phone Number", value=st.session_state.tab1_phone, key="tab1_phone")
-        st.session_state.tab1_phone = phone_number
+            # --- Session-state safe defaults ---
+            if "tab1_phone" not in st.session_state:
+                st.session_state.tab1_phone = "(555) 123-4567"
+            if "tab1_headline" not in st.session_state:
+                st.session_state.tab1_headline = f"Professional {business_type} Services"
+            if "tab1_description" not in st.session_state:
+                st.session_state.tab1_description = f"Expert {business_type} solutions for your home or business. Quality work guaranteed! Contact us today."
 
-        headline = st.text_input("Headline", value=st.session_state.tab1_headline, key="tab1_headline")
-        st.session_state.tab1_headline = headline
+            # --- Text Inputs ---
+            phone_number = st.text_input("Phone Number", value=st.session_state.tab1_phone, key="tab1_phone_input")
+            st.session_state.tab1_phone = phone_number
 
-        description = st.text_area("Description", value=st.session_state.tab1_description, key="tab1_description")
-        st.session_state.tab1_description = description
+            headline = st.text_input("Headline", value=st.session_state.tab1_headline, key="tab1_headline_input")
+            st.session_state.tab1_headline = headline
 
-        # --- AI Suggest ---
-        if st.button("💡 Suggest AI Text", key="tab1_ai_suggest"):
-            ai_result = generate_ai_copy(business_type)
-            st.session_state.tab1_headline = ai_result["headline"]
-            st.session_state.tab1_description = ai_result["description"] + "\n" + " ".join(ai_result["hashtags"])
-            st.success("✅ AI suggestion generated!")
-            st.write("**Headline:**", st.session_state.tab1_headline)
-            st.write("**Description + Hashtags:**", st.session_state.tab1_description)
+            description = st.text_area("Description", value=st.session_state.tab1_description, key="tab1_description_input")
+            st.session_state.tab1_description = description
 
-        # --- Generate Graphic ---
-        if st.button("Generate Graphic", type="primary", key="tab1_generate_graphic"):
-            if headline and description and phone_number:
-                hashtags_list = [tag for tag in description.split() if tag.startswith("#")]
-                image = create_social_media_graphic(template_type, business_type, headline, description, phone_number, hashtags_list)
-                os.makedirs("output", exist_ok=True)
-                image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
-                image.save(image_path)
-                st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
-                with open(image_path, "rb") as file:
-                    st.download_button("📥 Download Graphic", file, file_name=f"{business_type}_social_media_post.png", mime="image/png", key="tab1_download_btn")
-            else:
-                st.warning("⚠️ Please fill in all fields before generating.")
+            # --- AI Suggest ---
+            if st.button("💡 Suggest AI Text", key="tab1_ai_suggest"):
+                ai_result = generate_ai_copy(business_type)
+                st.session_state.tab1_headline = ai_result["headline"]
+                st.session_state.tab1_description = ai_result["description"] + "\n" + " ".join(ai_result["hashtags"])
+                st.success("✅ AI suggestion generated!")
+                st.write("**Headline:**", st.session_state.tab1_headline)
+                st.write("**Description + Hashtags:**", st.session_state.tab1_description)
 
-    # --- Tips Column ---
-    with col2:
-        st.header("💡 Tips")
-        tips = {
-            "Plumbing": "• Show before/after photos\n• Highlight emergency services\n• Share water-saving tips",
-            "Cleaning": "• Post sparkling results\n• Eco-friendly products\n• Seasonal specials",
-            "Landscaping": "• Garden transformations\n• Lawn care tips\n• Seasonal planting",
-            "HVAC": "• Maintenance tips\n• Energy efficiency\n• Emergency repairs",
-            "Electrical": "• Safety tips\n• Smart home installs\n• Code compliance"
-        }
-        st.write(tips[business_type], key="tab1_tips")
+            # --- Generate Graphic ---
+            if "generate_clicked" not in st.session_state:
+                st.session_state.generate_clicked = False
 
-# ---------------- Tab 2: Content Ideas ----------------
+            generate_placeholder = st.empty()
+            with generate_placeholder:
+                if st.button("Generate Graphic", type="primary", key="tab1_generate_graphic"):
+                    st.session_state.generate_clicked = True
+
+        # --- Tips Column ---
+        with col2:
+            st.header("💡 Tips")
+            tips = {
+                "Plumbing": "• Show before/after photos\n• Highlight emergency services\n• Share water-saving tips",
+                "Cleaning": "• Post sparkling results\n• Eco-friendly products\n• Seasonal specials",
+                "Landscaping": "• Garden transformations\n• Lawn care tips\n• Seasonal planting",
+                "HVAC": "• Maintenance tips\n• Energy efficiency\n• Emergency repairs",
+                "Electrical": "• Safety tips\n• Smart home installs\n• Code compliance"
+            }
+            st.write(tips[business_type], key="tab1_tips")
+
+    # Generate Graphic if clicked
+    if st.session_state.generate_clicked:
+        hashtags_list = [tag for tag in st.session_state.tab1_description.split() if tag.startswith("#")]
+        image = create_social_media_graphic(template_type, business_type, st.session_state.tab1_headline, st.session_state.tab1_description, st.session_state.tab1_phone, hashtags_list)
+        os.makedirs("output", exist_ok=True)
+        image_path = f"output/graphic_{datetime.now().strftime('%H%M%S')}.png"
+        image.save(image_path)
+        st.image(image_path, use_column_width=True, caption="Your Professional Social Media Graphic")
+        with open(image_path, "rb") as file:
+            st.download_button("📥 Download Graphic", file, file_name=f"{business_type}_social_media_post.png", mime="image/png", key="tab1_download_btn")
+
+# ---------------- Tab 2 ----------------
 with tab2:
     st.header("30-Day Content Ideas")
     content_ideas = [
