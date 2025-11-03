@@ -207,16 +207,12 @@ def create_social_media_graphic(template_type, business_type, headline, descript
     fig = create_plotly_template(business_type, headline, description, phone_number, colors)
     
     if fig:
-        return fig_to_image(fig)
+        # Display the Plotly figure directly in Streamlit
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        
+        # Return the figure for download (we'll handle download differently)
+        return fig
     return None
-    
-# App configuration
-st.set_page_config(
-    page_title="Social Media Generator Pro",
-    page_icon="🎯",
-    layout="wide"
-)
-
 # Plotly Debug Function
 def debug_plotly_system():
     st.sidebar.header("🔍 Plotly System Check")
