@@ -182,15 +182,15 @@ def create_plotly_template(business_type, headline, description, phone_number, c
         return None
 
 def fig_to_image(fig):
-    """Convert Plotly figure to PIL Image"""
+    """Simple Plotly to PIL conversion"""
     try:
-        # Convert to image bytes
-        img_bytes = pio.to_image(fig, format="png", width=1080, height=1080)
-        # Convert to PIL Image
+        # Don't specify engine - let Plotly choose
+        img_bytes = fig.to_image(format="png", width=1080, height=1080)
         return Image.open(BytesIO(img_bytes))
     except Exception as e:
         st.error(f"Image conversion error: {e}")
-        return None
+        # Create a simple fallback
+        return Image.new('RGB', (1080, 1080), color=(230, 240, 255))
 def create_social_media_graphic(template_type, business_type, headline, description, phone_number):
     """Main function to create social media graphics using Plotly"""
     color_schemes = {
