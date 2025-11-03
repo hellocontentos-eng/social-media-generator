@@ -172,62 +172,30 @@ st.set_page_config(
     layout="wide"
 )
 
-# TEMPORARY DEBUG FUNCTION
-def debug_font_loading():
-    st.sidebar.header("🔍 Debug Font Loading")
+# Plotly Debug Function
+def debug_plotly_system():
+    st.sidebar.header("🔍 Plotly System Check")
     
-    # Test font loading
-    try:
-        test_font = ImageFont.truetype("arial.ttf", 60)
-        st.sidebar.success("✅ Arial font loaded")
-    except:
-        st.sidebar.error("❌ Arial font failed")
-    
-    try:
-        test_font = ImageFont.truetype("arialbd.ttf", 60) 
-        st.sidebar.success("✅ Arial Bold font loaded")
-    except:
-        st.sidebar.error("❌ Arial Bold font failed")
-    
-    # Test if templates work
-    if st.sidebar.button("Test Template Creation"):
+    if st.sidebar.button("Test Plotly Template"):
         try:
-            test_image = create_template_modern(
-                "Plumbing", 
-                "TEST LARGE HEADLINE", 
-                "This is a test description to check readability", 
-                "(555) 123-4567",
-                {"primary": (0, 90, 180), "secondary": (30, 130, 230), "accent": (255, 140, 0)}
+            test_fig = create_plotly_template(
+                "Plumbing",
+                "Test Headline",
+                "Test description",
+                "(555) 123-4567", 
+                {"primary": (0, 90, 180), "accent": (255, 140, 0)}
             )
-            st.sidebar.image(test_image, caption="Template Test", use_column_width=True)
-            st.sidebar.success("✅ Template works!")
+            if test_fig:
+                test_img = fig_to_image(test_fig)
+                st.sidebar.image(test_img, caption="Plotly Test", use_column_width=True)
+                st.sidebar.success("✅ Plotly system works!")
+            else:
+                st.sidebar.error("❌ Plotly template failed")
         except Exception as e:
-            st.sidebar.error(f"❌ Template failed: {e}")
+            st.sidebar.error(f"❌ Plotly error: {e}")
 
 # Call the debug function
-debug_font_loading()
-
-# Simple local background system (FREE & RELIABLE)
-
-BACKGROUND_CACHE = {
-    "Plumbing": [
-        "backgrounds/plumbing_bg1.jpg"
-    ],
-    "Cleaning": [
-        "backgrounds/cleaning_bg1.jpg"  # Your actual cleaning image
-    ],
-    "HVAC": [
-        "backgrounds/hvac_bg1.jpg"      # Your actual HVAC image
-    ],
-    "Electrical": [
-        "backgrounds/electrical_bg1.jpg" # Your actual electrical image
-    ],
-    "Landscaping": [
-        "backgrounds/landscaping_bg1.jpg" # Your actual landscaping image
-    ]
-}
-
-
+debug_plotly_system()
 def create_fallback_background(business_type):
     """Create professional CSS-style background as fallback"""
     width, height = 1080, 1080
