@@ -12,6 +12,51 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import base64
 
+# ========== BACKGROUND SYSTEM ==========
+BACKGROUND_CACHE = {
+    "Plumbing": ["backgrounds/plumbing_bg1.jpg"],
+    "Cleaning": ["backgrounds/cleaning_bg1.jpg"],
+    "HVAC": ["backgrounds/hvac_bg1.jpg"],
+    "Electrical": ["backgrounds/electrical_bg1.jpg"],
+    "Landscaping": ["backgrounds/landscaping_bg1.jpg"]
+}
+
+def load_background_image(business_type):
+    """Load random background from local files"""
+    backgrounds = BACKGROUND_CACHE.get(business_type, BACKGROUND_CACHE["Plumbing"])
+    background_path = random.choice(backgrounds)
+    
+    try:
+        image = Image.open(background_path)
+        return image.resize((1080, 1080))
+    except Exception as e:
+        st.error(f"❌ Failed to load {background_path}: {e}")
+        return create_fallback_background(business_type)
+
+def create_fallback_background(business_type):
+    """Create professional CSS-style background as fallback"""
+    width, height = 1080, 1080
+    image = Image.new('RGB', (width, height), color=(255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    
+    color_schemes = {
+        "Plumbing": {"primary": (0, 90, 180), "secondary": (30, 130, 230)},
+        "Cleaning": {"primary": (30, 110, 40), "secondary": (80, 180, 120)},
+        "Landscaping": {"primary": (40, 120, 45), "secondary": (100, 180, 105)},
+        "HVAC": {"primary": (180, 30, 30), "secondary": (220, 70, 70)},
+        "Electrical": {"primary": (110, 25, 140), "secondary": (160, 90, 180)}
+    }
+    
+    colors = color_schemes.get(business_type, color_schemes["Plumbing"])
+    
+    for i in range(height):
+        r = int(colors["primary"][0] * (1 - i/height) + colors["secondary"][0] * (i/height))
+        g = int(colors["primary"][1] * (1 - i/height) + colors["secondary"][1] * (i/height))
+        b = int(colors["primary"][2] * (1 - i/height) + colors["secondary"][2] * (i/height))
+        draw.line([(0, i), (width, i)], fill=(r, g, b))
+    
+    return image
+
 # ========== PLOTLY TEMPLATE SYSTEM ==========
 def create_plotly_template(business_type, headline, description, phone_number, colors):
     """Create professional social media graphic using Plotly"""
